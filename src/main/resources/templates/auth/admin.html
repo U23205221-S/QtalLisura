@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Personal | Q'Tal Lisura</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/variables.css}" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link th:href="@{/css/cliente.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-left" style="background: linear-gradient(135deg, rgba(26,26,26,0.98) 0%, rgba(45,45,45,0.95) 100%), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800') center/cover no-repeat;">
+            <h1>QTal<span>Lisura</span></h1>
+            <p>Panel de Administración. Acceso exclusivo para personal autorizado del restaurante.</p>
+            <div class="mt-4">
+                <i class="bi bi-shield-lock-fill" style="font-size: 5rem; color: var(--primary-orange);"></i>
+            </div>
+        </div>
+        <div class="auth-right">
+            <div class="auth-form-container">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));">
+                        <i class="bi bi-person-badge-fill text-white" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h2>Acceso Personal</h2>
+                    <p>Ingresa tus credenciales de empleado</p>
+                </div>
+                <form class="auth-form" onsubmit="GastroCliente.loginAdmin(event)">
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <div class="input-icon">
+                            <i class="bi bi-person"></i>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="Tu nombre de usuario" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <div class="input-icon">
+                            <i class="bi bi-lock"></i>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Tu contraseña" required>
+                        </div>
+                    </div>
+                    <div class="form-options">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="remember">
+                            <label class="form-check-label" for="remember">Mantener sesión</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar al Sistema
+                    </button>
+                </form>
+                <div class="text-center mt-4 pt-3 border-top">
+                    <a th:href="@{/auth/login}" class="text-muted">
+                        <i class="bi bi-arrow-left me-1"></i>Volver al login de clientes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/cliente.js}"></script>
+</body>
+</html>

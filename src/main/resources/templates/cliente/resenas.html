@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Reseñas | Q'Tal Lisura</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/variables.css}" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link th:href="@{/css/cliente.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/layout-cliente :: layout-cliente(~{::content})}">
+        <th:block th:fragment="content">
+            <!-- Page Header -->
+            <div class="page-header" style="background: linear-gradient(135deg, rgba(26,26,26,0.9) 0%, rgba(45,45,45,0.8) 100%), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920') center/cover no-repeat;">
+                <div class="container">
+                    <h1>Mis Resenas</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                            <li class="breadcrumb-item active">Mis Resenas</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <section class="content-section">
+                <div class="container">
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="col-lg-3 mb-4">
+                            <div class="card-gastro p-4">
+                                <div class="text-center mb-4">
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));">
+                                        <i class="bi bi-person-fill text-white" style="font-size: 2.5rem;"></i>
+                                    </div>
+                                    <h5 th:text="${session.clienteNombre != null} ? ${session.clienteNombre} : 'Cliente'">Juan Perez</h5>
+                                    <p class="text-muted small mb-0">Cliente desde 2024</p>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <a th:href="@{/mis-pedidos}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none hover-bg">
+                                            <i class="bi bi-bag me-3 text-orange"></i> Mis Pedidos
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a th:href="@{/mis-resenas}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none" style="background: var(--light-orange-bg);">
+                                            <i class="bi bi-star-fill me-3 text-orange"></i> Mis Resenas
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a th:href="@{/mi-perfil}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none hover-bg">
+                                            <i class="bi bi-person me-3 text-orange"></i> Mi Perfil
+                                        </a>
+                                    </li>
+                                </ul>
+                                <hr>
+                                <div class="text-center">
+                                    <p class="small text-muted mb-1">Total de resenas</p>
+                                    <h3 class="text-orange mb-0" th:text="${resenas != null} ? ${#lists.size(resenas)} : '5'">5</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Main Content -->
+                        <div class="col-lg-9">
+                            <!-- Tabs -->
+                            <ul class="nav nav-pills mb-4">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#pendientes" data-bs-toggle="pill" style="background: var(--primary-orange);">
+                                        <i class="bi bi-hourglass-split me-1"></i> Pendientes de Resenar
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#realizadas" data-bs-toggle="pill">
+                                        <i class="bi bi-check-circle me-1"></i> Resenas Realizadas
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <!-- Pendientes -->
+                                <div class="tab-pane fade show active" id="pendientes">
+                                    <h5 class="mb-4">Productos pendientes de resenar</h5>
+                                    <!-- Pedido pendiente de resena -->
+                                    <div class="resena-card" data-pedido="1" data-producto="1">
+                                        <div class="resena-header">
+                                            <div class="resena-product">
+                                                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=60" alt="Pizza">
+                                                <div>
+                                                    <h6>Pizza Margherita</h6>
+                                                    <span>Pedido #001 - 20 Ene 2024</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="resena-rating mb-3">
+                                            <input type="hidden" name="calificacion" value="0">
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <span class="ms-2 text-muted small">Selecciona una calificacion</span>
+                                        </div>
+                                        <div class="resena-form">
+                                            <textarea class="mb-3" rows="3" placeholder="Cuentanos tu experiencia con este producto... (opcional)"></textarea>
+                                            <button class="btn btn-gastro" onclick="submitResena(1, 1)">
+                                                <i class="bi bi-send me-1"></i> Enviar Resena
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="resena-card" data-pedido="1" data-producto="2">
+                                        <div class="resena-header">
+                                            <div class="resena-product">
+                                                <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=60" alt="Limonada">
+                                                <div>
+                                                    <h6>Limonada Especial</h6>
+                                                    <span>Pedido #001 - 20 Ene 2024</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="resena-rating mb-3">
+                                            <input type="hidden" name="calificacion" value="0">
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <i class="bi bi-star empty"></i>
+                                            <span class="ms-2 text-muted small">Selecciona una calificacion</span>
+                                        </div>
+                                        <div class="resena-form">
+                                            <textarea class="mb-3" rows="3" placeholder="Cuentanos tu experiencia con este producto... (opcional)"></textarea>
+                                            <button class="btn btn-gastro" onclick="submitResena(1, 2)">
+                                                <i class="bi bi-send me-1"></i> Enviar Resena
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Realizadas -->
+                                <div class="tab-pane fade" id="realizadas">
+                                    <h5 class="mb-4">Mis resenas anteriores</h5>
+                                    <div class="resena-card" th:each="resena : ${resenas}" th:if="${resenas != null}">
+                                        <div class="resena-header">
+                                            <div class="resena-product">
+                                                <img th:src="@{'/uploads/products/' + ${resena.idProducto.imagenUrl}}" alt="Producto" onerror="this.src='https://via.placeholder.com/60'">
+                                                <div>
+                                                    <h6 th:text="${resena.idProducto.nombre}">Producto</h6>
+                                                    <span th:text="'Pedido #' + ${resena.idPedido.idPedido} + ' - ' + ${#temporals.format(resena.fechaResena, 'dd MMM yyyy')}">Pedido</span>
+                                                </div>
+                                            </div>
+                                            <div class="rating-stars">
+                                                <i th:each="i : ${#numbers.sequence(1, resena.calificacion)}" class="bi bi-star-fill"></i>
+                                                <i th:each="i : ${#numbers.sequence(resena.calificacion + 1, 5)}" class="bi bi-star empty"></i>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 text-muted" th:text="${resena.comentario}">Comentario de la resena</p>
+                                    </div>
+                                    <!-- Ejemplo de resenas realizadas -->
+                                    <div class="resena-card" th:if="${resenas == null}">
+                                        <div class="resena-header">
+                                            <div class="resena-product">
+                                                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=60" alt="Hamburguesa">
+                                                <div>
+                                                    <h6>Hamburguesa Premium</h6>
+                                                    <span>Pedido #002 - 15 Ene 2024</span>
+                                                </div>
+                                            </div>
+                                            <div class="rating-stars">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 text-muted">Excelente hamburguesa, la carne muy jugosa y el pan estaba perfecto. Sin duda la mejor que he probado!</p>
+                                    </div>
+                                    <div class="resena-card" th:if="${resenas == null}">
+                                        <div class="resena-header">
+                                            <div class="resena-product">
+                                                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=60" alt="Tiramisu">
+                                                <div>
+                                                    <h6>Tiramisu</h6>
+                                                    <span>Pedido #002 - 15 Ene 2024</span>
+                                                </div>
+                                            </div>
+                                            <div class="rating-stars">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star empty"></i>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 text-muted">Muy rico el tiramisu, buen balance entre el cafe y el mascarpone. Porcion generosa.</p>
+                                    </div>
+                                    <div class="resena-card" th:if="${resenas == null}">
+                                        <div class="resena-header">
+                                            <div class="resena-product">
+                                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=60" alt="Ensalada">
+                                                <div>
+                                                    <h6>Ensalada Cesar</h6>
+                                                    <span>Pedido #003 - 10 Ene 2024</span>
+                                                </div>
+                                            </div>
+                                            <div class="rating-stars">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-half"></i>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 text-muted">Ensalada muy fresca, los crutones caseros son un gran plus. La salsa cesar tiene muy buen sabor.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </th:block>
+    </div>
+    <style>
+        .hover-bg:hover { background: var(--light-orange-bg); }
+        .nav-pills .nav-link { color: var(--dark-gray); }
+        .nav-pills .nav-link:hover { background: var(--light-orange-bg); color: var(--primary-orange); }
+    </style>
+</body>
+</html>
