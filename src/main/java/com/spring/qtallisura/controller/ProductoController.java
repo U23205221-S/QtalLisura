@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/producto")
 @RequiredArgsConstructor
 @Slf4j
-public class ProductoController {
+public class    ProductoController {
 
     private final ProductoService productoService;
     private final FileStorageService fileStorageService;

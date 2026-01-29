@@ -47,10 +47,10 @@
                 <div class="d-flex align-items-center gap-2">
                     <!-- Si no está logueado -->
                     <th:block th:if="${session.clienteId == null}">
-                        <a th:href="@{/auth/login}" class="btn btn-login">
+                        <a th:href="@{/login}" class="btn btn-login">
                             <i class="bi bi-person"></i> Iniciar Sesión
                         </a>
-                        <a th:href="@{/auth/registro}" class="btn btn-register">
+                        <a th:href="@{/registro}" class="btn btn-register">
                             Registrarse
                         </a>
                     </th:block>

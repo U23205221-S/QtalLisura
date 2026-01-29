@@ -1,4 +1,2 @@
 # QtalLisura
-# QtalLisura
-# QtalLisura
-# QtalLisura
+
