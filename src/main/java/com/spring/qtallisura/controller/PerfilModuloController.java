@@ -17,7 +17,7 @@ public class PerfilModuloController {
     private final PerfilModuloService perfilModuloService;
 
     @PostMapping
-    public ResponseEntity<PerfilModuloResponseDTO > createPerfilModulo(@RequestBody PerfilModuloRequestDTO dtoRequest) {
+    public ResponseEntity<PerfilModuloResponseDTO> createPerfilModulo(@RequestBody PerfilModuloRequestDTO dtoRequest) {
         log.info("Recibida solicitud para crear perfil-modulo");
         PerfilModuloResponseDTO dtoResponse = perfilModuloService.create(dtoRequest);
         return ResponseEntity.status(201).body(dtoResponse);
@@ -53,7 +53,7 @@ public class PerfilModuloController {
 
     @RequestMapping("/test")
     public ResponseEntity<String> test() {
-        return ResponseEntity.ok("El controlador de perfiles-modulos funciona correctamente");
+        return ResponseEntity.ok("El controlador de perfil-modulo funciona correctamente");
     }
 
 }
