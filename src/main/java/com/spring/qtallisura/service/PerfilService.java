@@ -17,8 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PerfilService implements ServiceAbs<PerfilRequestDTO, PerfilResponseDTO> {
 
-    private PerfilRepository perfilRepository;
-    private PerfilMapper perfilMapper;
+    private final PerfilRepository perfilRepository;
+    private final PerfilMapper perfilMapper;
 
     @Transactional
     @Override

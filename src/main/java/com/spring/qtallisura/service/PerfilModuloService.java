@@ -19,10 +19,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PerfilModuloService implements ServiceAbs<PerfilModuloRequestDTO, PerfilModuloResponseDTO> {
 
-    private PerfilModuloRepository perfilModuloRepository;
-    private PerfilModuloMapper perfilModuloMapper;
-    private ModuloRepository moduloRepository;
-    private PerfilRepository perfilRepository;
+    private final PerfilModuloRepository perfilModuloRepository;
+    private final PerfilModuloMapper perfilModuloMapper;
+    private final ModuloRepository moduloRepository;
+    private final PerfilRepository perfilRepository;
 
     @Transactional
     @Override

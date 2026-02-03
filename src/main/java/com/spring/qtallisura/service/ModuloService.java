@@ -17,8 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ModuloService implements ServiceAbs<ModuloRequestDTO, ModuloResponseDTO> {
 
-    private ModuloRepository moduloRepository;
-    private ModuloMapper moduloMapper;
+    private final ModuloRepository moduloRepository;
+    private final ModuloMapper moduloMapper;
 
     @Transactional
     @Override
@@ -68,7 +68,6 @@ public class ModuloService implements ServiceAbs<ModuloRequestDTO, ModuloRespons
         return moduloMapper.toDTO(model);
     }
 
-    @Transactional
     private Modulo searchEntityById(Integer id) {
         log.info("ModuloService.searchEntityById()");
         return moduloRepository.findById(id)
