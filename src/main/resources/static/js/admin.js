@@ -51,7 +51,7 @@ function initModals() {
 }
 
 function loadProductoData(id) {
-    fetch(`/api/productos/${id}`)
+    fetch(`/producto/${id}`)
         .then(response => response.json())
         .then(data => {
             const form = document.querySelector('#productoModal form');
@@ -72,7 +72,7 @@ function saveProducto() {
     const data = Object.fromEntries(formData);
     const isEdit = data.id && data.id !== '';
 
-    fetch(isEdit ? `/api/productos/${data.id}` : '/api/productos', {
+    fetch(isEdit ? `/producto/${data.id}` : '/producto', {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -88,7 +88,7 @@ function saveProducto() {
 
 function deleteProducto(id) {
     if (confirm('¿Está seguro de eliminar este producto?')) {
-        fetch(`/api/productos/${id}`, { method: 'DELETE' })
+        fetch(`/producto/${id}`, { method: 'DELETE' })
             .then(() => {
                 showNotification('Producto eliminado', 'success');
                 location.reload();

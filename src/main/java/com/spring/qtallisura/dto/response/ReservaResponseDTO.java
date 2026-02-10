@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 public class ReservaResponseDTO {
 
     private Integer idReserva;
+    private Integer idCliente;
     private String clienteNombre;
+    private Integer idMesa;
     private Integer numeroMesa;
     private LocalDateTime fechaHora;
     private Integer telefono;

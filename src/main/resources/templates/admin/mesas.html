@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesas | Q'Tal Lisura Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/variables.css}" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/layout-admin :: layout-admin(~{::content})}">
+        <th:block th:fragment="content">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Gestión de Mesas</h2>
+                    <p class="text-muted mb-0">Administra las mesas del restaurante</p>
+                </div>
+                <button class="btn btn-gastro" onclick="openMesaModal('create')">
+                    <i class="bi bi-plus-lg"></i> Nueva Mesa
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="chart-card mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Buscar mesa</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Número de mesa..." id="searchMesa">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Estado Mesa</label>
+                        <select class="form-select" id="filterEstadoMesa">
+                            <option value="">Todos</option>
+                            <option value="DISPONIBLE">Disponible</option>
+                            <option value="OCUPADA">Ocupada</option>
+                            <option value="RESERVADA">Reservada</option>
+                            <option value="EN_MANTENIMIENTO">En Mantenimiento</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ubicación</label>
+                        <select class="form-select" id="filterUbicacion">
+                            <option value="">Todas</option>
+                            <option value="PRIMER_PISO">Primer Piso</option>
+                            <option value="SEGUNDO_PISO">Segundo Piso</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                            <i class="bi bi-funnel"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mesas Table -->
+            <div class="table-gastro">
+                <table id="mesasTable">
+                    <thead>
+                        <tr>
+                            <th data-sort>ID</th>
+                            <th data-sort>Nº Mesa</th>
+                            <th data-sort>Capacidad</th>
+                            <th>Ubicación</th>
+                            <th>Estado Mesa</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mesasTableBody">
+                        <!-- Los datos se cargarán dinámicamente desde JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Mesa -->
+            <div class="modal fade modal-gastro" id="mesaModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="mesaModalTitle">Nueva Mesa</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="mesaForm" class="needs-validation" novalidate>
+                                <input type="hidden" id="mesaId">
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="mesaNumero" class="form-label">Número de Mesa *</label>
+                                        <input type="number" class="form-control" id="mesaNumero" min="1" max="99" required>
+                                        <div class="invalid-feedback">Ingrese un número de mesa válido (1-99)</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="mesaCapacidad" class="form-label">Capacidad Máxima *</label>
+                                        <input type="number" class="form-control" id="mesaCapacidad" min="1" max="20" required>
+                                        <div class="invalid-feedback">Ingrese la capacidad (1-20 personas)</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="mesaUbicacion" class="form-label">Ubicación *</label>
+                                        <select class="form-select" id="mesaUbicacion" required>
+                                            <option value="">Seleccione ubicación</option>
+                                            <option value="PRIMER_PISO">Primer Piso</option>
+                                            <option value="SEGUNDO_PISO">Segundo Piso</option>
+                                        </select>
+                                        <div class="invalid-feedback">Seleccione una ubicación</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="mesaEstadoMesa" class="form-label">Estado de Mesa *</label>
+                                        <select class="form-select" id="mesaEstadoMesa" required>
+                                            <option value="DISPONIBLE">Disponible</option>
+                                            <option value="OCUPADA">Ocupada</option>
+                                            <option value="RESERVADA">Reservada</option>
+                                            <option value="EN_MANTENIMIENTO">En Mantenimiento</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mesaEstado" class="form-label">Estado BD *</label>
+                                    <select class="form-select" id="mesaEstado" required>
+                                        <option value="ACTIVO">Activo</option>
+                                        <option value="INACTIVO">Inactivo</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-gastro" onclick="saveMesa()">
+                                <i class="bi bi-check-lg"></i> Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </th:block>
+    </div>
+
+    <script th:src="@{/js/mesas-admin.js}"></script>
+</body>
+</html>
+

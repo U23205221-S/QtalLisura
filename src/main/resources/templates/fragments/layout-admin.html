@@ -19,26 +19,16 @@
             <nav class="sidebar-nav">
                 <p class="nav-section-title">Principal</p>
                 <ul>
-                    <!-- Módulos dinámicos basados en permisos del usuario -->
-                    <li th:each="modulo : ${modulosPermitidos}">
-                        <a th:href="@{/admin/{nombreModulo}(nombreModulo=${#strings.toLowerCase(modulo.nombre)})}"
-                           th:classappend="${#strings.contains(currentPath, #strings.toLowerCase(modulo.nombre))} ? 'active' : ''">
-                            <i th:class="${modulo.nombre == 'Dashboard' ? 'bi bi-grid-1x2-fill' :
-                                          modulo.nombre == 'Productos' ? 'bi bi-box-seam-fill' :
-                                          modulo.nombre == 'Categorías' ? 'bi bi-tags-fill' :
-                                          modulo.nombre == 'Pedidos' ? 'bi bi-receipt' :
-                                          modulo.nombre == 'Mesas' ? 'bi bi-diagram-3-fill' :
-                                          modulo.nombre == 'Reseñas' ? 'bi bi-star-fill' :
-                                          modulo.nombre == 'Inventario' ? 'bi bi-clipboard-data-fill' :
-                                          'bi bi-circle-fill'}"></i>
-                            <span th:text="${modulo.nombre}">Módulo</span>
+                    <li>
+                        <a th:href="@{/admin/dashboard}" th:classappend="${currentPath == '/admin/dashboard'} ? 'active' : ''">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>Dashboard</span>
                         </a>
                     </li>
                 </ul>
 
-                <!-- Sección de gestión estática (opcional, puedes eliminarla si prefieres 100% dinámico) -->
-                <p class="nav-section-title" th:if="${#lists.isEmpty(modulosPermitidos)}">Gestión</p>
-                <ul th:if="${#lists.isEmpty(modulosPermitidos)}">
+                <p class="nav-section-title">Gestión</p>
+                <ul>
                     <li>
                         <a th:href="@{/admin/productos}" th:classappend="${currentPath == '/admin/productos'} ? 'active' : ''">
                             <i class="bi bi-box-seam-fill"></i>
@@ -52,31 +42,21 @@
                         </a>
                     </li>
                     <li>
-                        <a th:href="@{/admin/pedidos}" th:classappend="${currentPath == '/admin/pedidos'} ? 'active' : ''">
-                            <i class="bi bi-receipt"></i>
-                            <span>Pedidos</span>
-                        </a>
-                    </li>
-                    <li>
                         <a th:href="@{/admin/mesas}" th:classappend="${currentPath == '/admin/mesas'} ? 'active' : ''">
                             <i class="bi bi-diagram-3-fill"></i>
                             <span>Mesas</span>
                         </a>
                     </li>
-                </ul>
-
-                <p class="nav-section-title" th:if="${#lists.isEmpty(modulosPermitidos)}">Reportes</p>
-                <ul th:if="${#lists.isEmpty(modulosPermitidos)}">
                     <li>
-                        <a th:href="@{/admin/resenas}" th:classappend="${currentPath == '/admin/resenas'} ? 'active' : ''">
-                            <i class="bi bi-star-fill"></i>
-                            <span>Reseñas</span>
+                        <a th:href="@{/admin/reservas}" th:classappend="${currentPath == '/admin/reservas'} ? 'active' : ''">
+                            <i class="bi bi-calendar-check-fill"></i>
+                            <span>Reservas</span>
                         </a>
                     </li>
                     <li>
-                        <a th:href="@{/admin/inventario}" th:classappend="${currentPath == '/admin/inventario'} ? 'active' : ''">
-                            <i class="bi bi-clipboard-data-fill"></i>
-                            <span>Inventario</span>
+                        <a th:href="@{/admin/usuarios}" th:classappend="${currentPath == '/admin/usuarios'} ? 'active' : ''">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Usuarios</span>
                         </a>
                     </li>
                 </ul>

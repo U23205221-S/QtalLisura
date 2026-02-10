@@ -105,7 +105,7 @@ function submitResena(pedidoId, productoId) {
         return;
     }
 
-    fetch('/api/resenas', {
+    fetch('/resena', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -155,19 +155,22 @@ function loginCliente(event) {
     const dni = form.querySelector('#dni').value;
     const password = form.querySelector('#password').value;
 
-    fetch('/api/clientes/login', {
+    fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dni, contrasena: password })
+        body: JSON.stringify({ username: dni, password: password })
     })
     .then(response => {
         if (response.ok) return response.json();
         throw new Error('Credenciales incorrectas');
     })
     .then(data => {
-        sessionStorage.setItem('clienteId', data.idCliente);
-        sessionStorage.setItem('clienteNombre', data.nombre);
-        window.location.href = '/cliente';
+        if (data.success) {
+            // Redirigir según el perfil
+            window.location.href = data.redirectUrl || '/catalogo';
+        } else {
+            throw new Error(data.message || 'Error en el login');
+        }
     })
     .catch(error => {
         showAlert(error.message, 'danger');
@@ -198,20 +201,37 @@ function registerCliente(event) {
         return;
     }
 
-    fetch('/api/clientes/registro', {
+    fetch('/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (response.ok) return response.json();
-        throw new Error('Error en el registro');
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('El servidor no devolvió JSON. Verifica la consola del backend.');
+        }
+
+        if (response.ok) {
+            return response.json();
+        }
+
+        // Si hay error, intentar obtener el mensaje de error
+        return response.json().then(err => {
+            throw new Error(err.message || 'Error en el registro');
+        });
     })
     .then(data => {
-        showAlert('¡Registro exitoso! Ya puedes iniciar sesión', 'success');
-        document.querySelector('[data-target="login"]')?.click();
+        if (data.success) {
+            showAlert('¡Registro exitoso! Ya puedes iniciar sesión', 'success');
+            document.querySelector('[data-target="login"]')?.click();
+        } else {
+            showAlert(data.message || 'Error en el registro', 'danger');
+        }
     })
     .catch(error => {
+        console.error('Error completo:', error);
         showAlert(error.message, 'danger');
     });
 }

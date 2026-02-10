@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservar Mesa | Q'Tal Lisura</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/variables.css}" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link th:href="@{/css/cliente.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/layout-cliente :: layout-cliente(~{::content})}">
+        <th:block th:fragment="content">
+            <section class="hero-reservas py-5" style="background: linear-gradient(135deg, var(--primary-orange) 0%, #4a2c2a 100%);">
+                <div class="container text-center text-white py-4">
+                    <h1 class="display-4 fw-bold mb-3"><i class="bi bi-calendar-check me-3"></i>Reserva tu Mesa</h1>
+                    <p class="lead mb-0">Asegura tu lugar para disfrutar de la mejor gastronomía peruana</p>
+                </div>
+            </section>
+            <section class="py-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card shadow-lg border-0">
+                                <div class="card-header bg-white py-4 border-0">
+                                    <h4 class="mb-0 text-center"><i class="bi bi-pencil-square text-primary me-2"></i>Completa tu Reserva</h4>
+                                </div>
+                                <div class="card-body p-4 p-md-5">
+                                    <form id="reservaForm" class="needs-validation" novalidate>
+                                        <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-person-circle me-2"></i>Datos del Cliente</h5>
+                                        <div class="row mb-4">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="clienteNombre" class="form-label">Nombre Completo *</label>
+                                                <input type="text" class="form-control form-control-lg" id="clienteNombre" placeholder="Tu nombre completo" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="clienteTelefono" class="form-label">Teléfono *</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">+51</span>
+                                                    <input type="tel" class="form-control form-control-lg" id="clienteTelefono" placeholder="999888777" maxlength="9" pattern="[0-9]{9}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-calendar-event me-2"></i>Detalles de la Reserva</h5>
+                                        <div class="row mb-4">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="fechaHora" class="form-label">Fecha y Hora *</label>
+                                                <input type="datetime-local" class="form-control form-control-lg" id="fechaHora" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="cantidadPersonas" class="form-label">Cantidad de Personas *</label>
+                                                <select class="form-select form-select-lg" id="cantidadPersonas" required>
+                                                    <option value="">Selecciona...</option>
+                                                    <option value="1">1 persona</option>
+                                                    <option value="2">2 personas</option>
+                                                    <option value="3">3 personas</option>
+                                                    <option value="4">4 personas</option>
+                                                    <option value="5">5 personas</option>
+                                                    <option value="6">6 personas</option>
+                                                    <option value="8">8 personas</option>
+                                                    <option value="10">10+ personas</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="mesaSelect" class="form-label">Mesa Disponible *</label>
+                                            <select class="form-select form-select-lg" id="mesaSelect" required>
+                                                <option value="">Selecciona una mesa...</option>
+                                            </select>
+                                            <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Solo mesas disponibles con capacidad suficiente</small>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="notasEspeciales" class="form-label">Notas Especiales (opcional)</label>
+                                            <textarea class="form-control" id="notasEspeciales" rows="3" placeholder="Solicitudes especiales..." maxlength="300"></textarea>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-gastro btn-lg py-3"><i class="bi bi-check-circle me-2"></i>Confirmar Reserva</button>
+                                        </div>
+                                        <div id="reservaMessage" class="alert mt-4 d-none"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </th:block>
+    </div>
+    <script th:src="@{/js/reservas-cliente.js}"></script>
+</body>
+</html>
+

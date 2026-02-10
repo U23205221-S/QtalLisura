@@ -37,6 +37,8 @@ public class AdminController {
 
         model.addAttribute("totalProductos", totalProductos);
         model.addAttribute("totalPedidos", totalPedidos);
+        model.addAttribute("usuarioLogueado", usuario);
+        model.addAttribute("currentPath", "/admin/dashboard");
 
         return "admin/dashboard";
     }
@@ -75,6 +77,33 @@ public class AdminController {
         }
 
         return "admin/categorias";
+    }
+
+    @GetMapping("/mesas")
+    public String mesas(Model model, HttpSession session) {
+        log.info("AdminController.mesas()");
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        return "admin/mesas";
+    }
+
+    @GetMapping("/reservas")
+    public String reservas(Model model, HttpSession session) {
+        log.info("AdminController.reservas()");
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("usuarioLogueado", usuario);
+        model.addAttribute("currentPath", "/admin/reservas");
+
+        return "admin/reservas";
     }
 }
 

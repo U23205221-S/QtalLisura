@@ -2,15 +2,18 @@ package com.spring.qtallisura.dto.request;
 
 import com.spring.qtallisura.model.EstadoBD;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ClienteRequestDTO {
 
     @NotBlank(message = "El nombre es obligatorio")
@@ -25,7 +28,7 @@ public class ClienteRequestDTO {
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 8, max = 200, message = "La contraseña debe tener entre 8 y 200 caracteres")
     private String contrasena;
-    @NotNull(message = "El estado es obligatorio")
+    // EstadoBD es opcional, se establece por defecto como ACTIVO en el servicio
     private EstadoBD estadoBD;
 
 }

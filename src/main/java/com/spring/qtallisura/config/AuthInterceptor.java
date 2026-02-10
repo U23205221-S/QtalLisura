@@ -36,7 +36,25 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         // Verificar si hay sesión activa
-        if (session == null || session.getAttribute("usuarioLogueado") == null) {
+        if (session == null) {
+            log.warn("Acceso no autorizado a: {} - Redirigiendo a login", requestURI);
+            response.sendRedirect("/login");
+            return false;
+        }
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Object cliente = session.getAttribute("clienteLogueado");
+
+        if (isAdminPath(requestURI)) {
+            if (usuario == null) {
+                log.warn("Acceso no autorizado a admin: {} - Redirigiendo a login", requestURI);
+                response.sendRedirect("/login");
+                return false;
+            }
+            return true;
+        }
+
+        if (usuario == null && cliente == null) {
             log.warn("Acceso no autorizado a: {} - Redirigiendo a login", requestURI);
             response.sendRedirect("/login");
             return false;
@@ -111,5 +129,8 @@ public class AuthInterceptor implements HandlerInterceptor {
                path.startsWith("/h2-console") ||
                path.contains("favicon.ico");
     }
-}
 
+    private boolean isAdminPath(String path) {
+        return path.startsWith("/admin");
+    }
+}

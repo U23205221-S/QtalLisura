@@ -11,6 +11,7 @@ import com.spring.qtallisura.service.abstractService.ServiceAbs;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class ClienteService implements ServiceAbs<ClienteRequestDTO, ClienteResp
 
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -32,7 +34,11 @@ public class ClienteService implements ServiceAbs<ClienteRequestDTO, ClienteResp
             throw new EServiceLayer("El DNI ya está registrado en el sistema");
         }
         Cliente model = clienteMapper.toModel(dto);
+
+        // Encriptar contraseña antes de guardar
+        model.setContrasena(passwordEncoder.encode(dto.getContrasena()));
         model.setEstadoBD(EstadoBD.ACTIVO);
+
         model = clienteRepository.save(model);
         return clienteMapper.toDTO(model);
     }

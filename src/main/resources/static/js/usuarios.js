@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Cargar perfiles para el select
 async function cargarPerfiles() {
     try {
-        const response = await fetch('/api/perfil');
+        const response = await fetch('/perfil');
         if (response.ok) {
             perfilesData = await response.json();
             const selects = ['#usuarioPerfil', '#filterPerfil'];

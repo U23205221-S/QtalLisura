@@ -17,7 +17,9 @@ import org.mapstruct.ReportingPolicy;
 public interface ReservaMapper extends Convert<Reserva, ReservaRequestDTO, ReservaResponseDTO>,
         UpdatePatch<ReservaRequestDTO, Reserva> {
 
+    @Mapping(target = "idCliente", source = "idCliente.idCliente")
     @Mapping(target = "clienteNombre", expression = "java(model.getIdCliente().getNombre() + \" \" + model.getIdCliente().getApellido())")
+    @Mapping(target = "idMesa", source = "idMesa.idMesa")
     @Mapping(target = "numeroMesa", source = "idMesa.numeroMesa")
     @Mapping(target = "estadoSolicitud", source = "estadoSolicitud.estado")
     @Mapping(target = "estadoBD", source = "estadoBD.nombre")

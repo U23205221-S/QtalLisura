@@ -153,15 +153,6 @@ function toggleFavorite(button, productoId) {
     }
 }
 
-// Agregar al carrito
-function agregarAlCarrito(productoId) {
-    const producto = todosLosProductos.find(p => p.idProducto === productoId);
-    if (producto) {
-        console.log('Agregando al carrito:', producto);
-        // Aquí puedes implementar la lógica del carrito
-        mostrarNotificacion(`${producto.nombre} agregado al carrito`, 'success');
-    }
-}
 
 // Notificación
 function mostrarNotificacion(mensaje, tipo = 'info') {
