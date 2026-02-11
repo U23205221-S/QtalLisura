@@ -46,6 +46,12 @@ public class HomeController {
         return "cliente/nosotros";
     }
 
+    @GetMapping("/contacto")
+    public String contacto() {
+        log.info("HomeController.contacto() - Renderizando página de contacto");
+        return "cliente/contacto";
+    }
+
     @GetMapping("/reservas")
     public String reservas() {
         log.info("HomeController.reservas() - Renderizando página de reservas");

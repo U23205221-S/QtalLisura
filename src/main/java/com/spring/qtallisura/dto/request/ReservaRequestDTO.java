@@ -3,8 +3,10 @@ package com.spring.qtallisura.dto.request;
 import com.spring.qtallisura.model.EstadoBD;
 import com.spring.qtallisura.model.Reserva;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReservaRequestDTO {
 
     @NotNull(message = "El id del cliente es obligatorio")

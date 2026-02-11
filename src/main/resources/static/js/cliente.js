@@ -268,8 +268,24 @@ function loginAdmin(event) {
 
 // Logout
 function logout() {
-    sessionStorage.clear();
-    window.location.href = '/';
+    // Llamar al endpoint de logout del backend para invalidar la sesión
+    fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Limpiar sessionStorage local
+        sessionStorage.clear();
+        // Redirigir al inicio
+        window.location.href = '/';
+    })
+    .catch(error => {
+        console.error('Error en logout:', error);
+        // Incluso si hay error, limpiar y redirigir
+        sessionStorage.clear();
+        window.location.href = '/';
+    });
 }
 
 // Mostrar alertas

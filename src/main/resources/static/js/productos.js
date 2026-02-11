@@ -3,9 +3,18 @@
 let productosData = [];
 let categoriasData = [];
 let productoModal;
+let verProductoModal;
+let confirmarEliminarProductoModal;
+let productoAEliminar = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     productoModal = new bootstrap.Modal(document.getElementById('productoModal'));
+    verProductoModal = new bootstrap.Modal(document.getElementById('verProductoModal'));
+    confirmarEliminarProductoModal = new bootstrap.Modal(document.getElementById('confirmarEliminarProductoModal'));
+    
+    // Configurar botón de confirmación de eliminación
+    document.getElementById('btnConfirmarEliminarProducto').addEventListener('click', confirmarEliminarProducto);
+    
     cargarCategorias();
     cargarProductos();
     setupFilters();
@@ -88,9 +97,13 @@ function renderProductos(productos) {
                 </span>
             </td>
             <td>
-                <span class="status-badge ${producto.estadoBD && producto.estadoBD.toLowerCase() === 'activo' ? 'active' : 'inactive'}">
-                    ${producto.estadoBD}
-                </span>
+                <div class="form-check form-switch d-flex align-items-center justify-content-center">
+                    <input class="form-check-input" type="checkbox" role="switch" 
+                           id="switchProducto${producto.idProducto}"
+                           ${producto.estadoBD === 'ACTIVO' ? 'checked' : ''}
+                           onchange="toggleEstadoProducto(${producto.idProducto}, this.checked)"
+                           title="${producto.estadoBD === 'ACTIVO' ? 'Desactivar' : 'Activar'} producto">
+                </div>
             </td>
             <td>
                 <div class="action-btns">
@@ -161,7 +174,6 @@ async function cargarDatosProducto(id) {
             document.getElementById('productoStock').value = producto.stockActual;
             document.getElementById('productoStockMin').value = producto.stockMinimo;
             document.getElementById('productoCosto').value = producto.costoUnitario;
-            document.getElementById('productoEstado').value = producto.estadoBD;
 
             if (producto.imagenUrl) {
                 document.getElementById('productoImgPreview').src = '/uploads/products/' + producto.imagenUrl;
@@ -178,11 +190,55 @@ function editarProducto(id) {
     openProductoModal('edit', id);
 }
 
-// Ver producto
+// Ver producto (modal Bootstrap)
 function verProducto(id) {
     const producto = productosData.find(p => p.idProducto == id);
     if (producto) {
-        alert(`Producto: ${producto.nombre}\nDescripción: ${producto.descripcion}\nPrecio: S/ ${producto.precioVenta}\nStock: ${producto.stockActual}\nCategoría: ${producto.categoriaNombre}`);
+        document.getElementById('verProductoImagen').src = producto.imagenUrl 
+            ? '/uploads/products/' + producto.imagenUrl 
+            : 'https://via.placeholder.com/150';
+        document.getElementById('verProductoNombre').textContent = producto.nombre;
+        document.getElementById('verProductoDescripcion').textContent = producto.descripcion;
+        document.getElementById('verProductoCategoria').textContent = producto.categoriaNombre || 'Sin categoría';
+        document.getElementById('verProductoPrecio').textContent = `S/ ${Number(producto.precioVenta).toFixed(2)}`;
+        document.getElementById('verProductoStock').textContent = producto.stockActual;
+        document.getElementById('verProductoStockMin').textContent = producto.stockMinimo;
+        document.getElementById('verProductoCosto').textContent = `S/ ${Number(producto.costoUnitario).toFixed(2)}`;
+        
+        const estadoBadge = document.getElementById('verProductoEstado');
+        estadoBadge.textContent = producto.estadoBD === 'ACTIVO' ? 'Activo' : 'Inactivo';
+        estadoBadge.className = `badge ${producto.estadoBD === 'ACTIVO' ? 'bg-success' : 'bg-secondary'}`;
+        
+        verProductoModal.show();
+    }
+}
+
+// Toggle estado del producto
+async function toggleEstadoProducto(id, activo) {
+    const nuevoEstado = activo ? 'ACTIVO' : 'INACTIVO';
+    
+    try {
+        // Solo enviamos el estadoBD, el backend acepta campos opcionales
+        const formData = new FormData();
+        formData.append('estadoBD', nuevoEstado);
+
+        const response = await fetch(`/producto/${id}`, {
+            method: 'PUT',
+            body: formData
+        });
+
+        if (response.ok) {
+            showNotification(`Producto ${activo ? 'activado' : 'desactivado'} exitosamente`, 'success');
+            cargarProductos();
+        } else {
+            showNotification('Error al cambiar estado', 'error');
+            // Revertir el switch
+            document.getElementById(`switchProducto${id}`).checked = !activo;
+        }
+    } catch (error) {
+        console.error('Error al cambiar estado:', error);
+        showNotification('Error al cambiar estado', 'error');
+        document.getElementById(`switchProducto${id}`).checked = !activo;
     }
 }
 
@@ -206,7 +262,14 @@ async function saveProducto() {
     formData.append('stockActual', document.getElementById('productoStock').value);
     formData.append('stockMinimo', document.getElementById('productoStockMin').value);
     formData.append('costoUnitario', document.getElementById('productoCosto').value);
-    formData.append('estadoBD', document.getElementById('productoEstado').value);
+    
+    // Si es nuevo, estado ACTIVO por defecto; si es edición, mantener el estado actual
+    if (id) {
+        const producto = productosData.find(p => p.idProducto == id);
+        formData.append('estadoBD', producto ? producto.estadoBD : 'ACTIVO');
+    } else {
+        formData.append('estadoBD', 'ACTIVO');
+    }
 
     const imagenInput = document.getElementById('productoImagen');
     if (imagenInput.files.length > 0) {
@@ -236,17 +299,28 @@ async function saveProducto() {
     }
 }
 
-// Eliminar producto
-async function deleteProducto(id) {
-    if (!confirm('¿Está seguro de eliminar este producto?')) return;
+// Eliminar producto (abrir modal de confirmación)
+function deleteProducto(id) {
+    const producto = productosData.find(p => p.idProducto == id);
+    if (producto) {
+        productoAEliminar = id;
+        document.getElementById('eliminarProductoNombre').textContent = producto.nombre;
+        confirmarEliminarProductoModal.show();
+    }
+}
 
+// Confirmar eliminación del producto
+async function confirmarEliminarProducto() {
+    if (!productoAEliminar) return;
+    
     try {
-        const response = await fetch(`/producto/${id}`, {
+        const response = await fetch(`/producto/${productoAEliminar}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
             showNotification('Producto eliminado exitosamente', 'success');
+            confirmarEliminarProductoModal.hide();
             cargarProductos();
         } else {
             showNotification('Error al eliminar producto', 'error');
@@ -254,6 +328,8 @@ async function deleteProducto(id) {
     } catch (error) {
         console.error('Error al eliminar producto:', error);
         showNotification('Error al eliminar producto', 'error');
+    } finally {
+        productoAEliminar = null;
     }
 }
 
@@ -316,4 +392,3 @@ function showNotification(message, type = 'info') {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
-

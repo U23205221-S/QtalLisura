@@ -80,7 +80,12 @@ public class CategoriaService implements ServiceAbs<CategoriaRequestDTO,Categori
 
         Categoria model_actualizado = categoriaMapper.toModel(dto);
         model_actualizado.setIdCategoria(model_existente.getIdCategoria());
-        model_actualizado.setEstadoBD(model_existente.getEstadoBD());
+        // Usar el estadoBD del DTO si viene, sino mantener el existente
+        if (dto.getEstadoBD() != null) {
+            model_actualizado.setEstadoBD(dto.getEstadoBD());
+        } else {
+            model_actualizado.setEstadoBD(model_existente.getEstadoBD());
+        }
 
         model_actualizado = categoriaRepository.save(model_actualizado);
         return categoriaMapper.toDTO(model_actualizado);

@@ -18,7 +18,7 @@ public interface ProductoMapper extends Convert<Producto, ProductoRequestDTO, Pr
         UpdatePatch<ProductoRequestDTO ,Producto > {
 
     @Mapping(target = "categoriaNombre", source = "idCategoria.nombre")
-    @Mapping(target = "estadoBD", source = "estadoBD.nombre")
+    @Mapping(target = "estadoBD", expression = "java(model.getEstadoBD().name())")
     @Override
     ProductoResponseDTO toDTO(Producto model);
 

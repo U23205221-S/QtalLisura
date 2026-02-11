@@ -16,7 +16,7 @@ import org.mapstruct.ReportingPolicy;
 public interface CategoriaMapper extends Convert<Categoria, CategoriaRequestDTO, CategoriaResponseDTO>,
         UpdatePatch<CategoriaRequestDTO ,Categoria > {
 
-    @Mapping(target = "estadoBD", source = "estadoBD.nombre")
+    @Mapping(target = "estadoBD", expression = "java(model.getEstadoBD().name())")
     @Override
     CategoriaResponseDTO toDTO(Categoria model);
 

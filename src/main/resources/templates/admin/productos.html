@@ -187,14 +187,7 @@
                                                    accept="image/*" onchange="previewImageProducto(this)">
                                             <small class="text-muted d-block mt-2">JPG, PNG, GIF. Máx. 5MB</small>
                                         </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Estado</label>
-                                            <select class="form-select form-control-gastro" id="productoEstado" name="estadoBD">
-                                                <option value="ACTIVO">Activo</option>
-                                                <option value="INACTIVO">Inactivo</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -202,6 +195,86 @@
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="button" class="btn btn-gastro" onclick="saveProducto()">
                                 <i class="bi bi-check-lg me-1"></i> Guardar Producto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Ver Detalles Producto -->
+            <div class="modal fade" id="verProductoModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Detalles del Producto</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center mb-3">
+                                <img id="verProductoImagen" src="https://via.placeholder.com/150" 
+                                     class="img-fluid rounded" style="max-height: 150px; object-fit: cover;" alt="Producto">
+                            </div>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th class="text-muted" width="40%">Nombre:</th>
+                                    <td id="verProductoNombre" class="fw-bold"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Descripción:</th>
+                                    <td id="verProductoDescripcion"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Categoría:</th>
+                                    <td id="verProductoCategoria"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Precio:</th>
+                                    <td id="verProductoPrecio" class="text-success fw-bold"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Stock Actual:</th>
+                                    <td id="verProductoStock"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Stock Mínimo:</th>
+                                    <td id="verProductoStockMin"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Costo Unitario:</th>
+                                    <td id="verProductoCosto"></td>
+                                </tr>
+                                <tr>
+                                    <th class="text-muted">Estado:</th>
+                                    <td><span id="verProductoEstado" class="badge"></span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Confirmar Eliminación Producto -->
+            <div class="modal fade" id="confirmarEliminarProductoModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="bi bi-trash display-4 text-danger mb-3 d-block"></i>
+                            <h5>¿Está seguro de eliminar este producto?</h5>
+                            <p class="text-muted mb-0">Esta acción marcará el producto como eliminado.</p>
+                            <p class="fw-bold mt-2" id="eliminarProductoNombre"></p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </button>
+                            <button type="button" class="btn btn-danger" id="btnConfirmarEliminarProducto">
+                                <i class="bi bi-trash me-1"></i>Eliminar
                             </button>
                         </div>
                     </div>

@@ -161,16 +161,29 @@ public class AuthController {
     @PostMapping("/logout")
     @ResponseBody
     public ResponseEntity<?> logout(HttpSession session) {
+        String redirectUrl = "/";
+
+        // Verificar si es un usuario del sistema
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario != null) {
             log.info("Logout de usuario: {}", usuario.getUsername());
+            redirectUrl = "/admin"; // Redirigir a la página de login de admin
         }
+
+        // Verificar si es un cliente
+        Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
+        if (cliente != null) {
+            log.info("Logout de cliente: {} {}", cliente.getNombre(), cliente.getApellido());
+            redirectUrl = "/"; // Redirigir a la página principal para clientes
+        }
+
+        // Invalidar la sesión completa
         session.invalidate();
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", "Logout exitoso",
-                "redirectUrl", "/login"
+                "message", "Sesión cerrada exitosamente",
+                "redirectUrl", redirectUrl
         ));
     }
 

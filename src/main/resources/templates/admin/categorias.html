@@ -101,22 +101,73 @@
                                       placeholder="Describe la categoría..."></textarea>
                             <div class="invalid-feedback">La descripción es obligatoria (máx. 250 caracteres)</div>
                         </div>
-
-                        <!-- Estado -->
-                        <div class="mb-3">
-                            <label for="categoriaEstado" class="form-label">Estado <span class="text-danger">*</span></label>
-                            <select class="form-select" id="categoriaEstado" name="estadoBD" required>
-                                <option value="ACTIVO">Activo</option>
-                                <option value="INACTIVO">Inactivo</option>
-                            </select>
-                            <div class="invalid-feedback">Debe seleccionar un estado</div>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-gastro" onclick="saveCategoria()">
                         <i class="bi bi-save"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Detalles Categoría -->
+    <div class="modal fade" id="verCategoriaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Detalles de la Categoría</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="text-muted" width="40%">ID:</th>
+                            <td id="verCategoriaId" class="fw-bold"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Nombre:</th>
+                            <td id="verCategoriaNombre" class="fw-bold"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Descripción:</th>
+                            <td id="verCategoriaDescripcion"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Estado:</th>
+                            <td><span id="verCategoriaEstado" class="badge"></span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmar Eliminación Categoría -->
+    <div class="modal fade" id="confirmarEliminarCategoriaModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-trash display-4 text-danger mb-3 d-block"></i>
+                    <h5>¿Está seguro de eliminar esta categoría?</h5>
+                    <p class="text-muted mb-0">Esta acción marcará la categoría como eliminada.</p>
+                    <p class="fw-bold mt-2" id="eliminarCategoriaNombre"></p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminarCategoria">
+                        <i class="bi bi-trash me-1"></i>Eliminar
                     </button>
                 </div>
             </div>

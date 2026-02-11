@@ -2,9 +2,18 @@
 
 let categoriasData = [];
 let categoriaModal;
+let verCategoriaModal;
+let confirmarEliminarCategoriaModal;
+let categoriaAEliminar = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     categoriaModal = new bootstrap.Modal(document.getElementById('categoriaModal'));
+    verCategoriaModal = new bootstrap.Modal(document.getElementById('verCategoriaModal'));
+    confirmarEliminarCategoriaModal = new bootstrap.Modal(document.getElementById('confirmarEliminarCategoriaModal'));
+    
+    // Configurar botón de confirmación de eliminación
+    document.getElementById('btnConfirmarEliminarCategoria').addEventListener('click', confirmarEliminarCategoria);
+    
     cargarCategorias();
     setupFilters();
 });
@@ -41,9 +50,13 @@ function renderCategorias(categorias) {
             <td>${categoria.nombre}</td>
             <td>${categoria.descripcion}</td>
             <td>
-                <span class="status-badge ${categoria.estadoBD && categoria.estadoBD.toLowerCase() === 'activo' ? 'active' : 'inactive'}">
-                    ${categoria.estadoBD}
-                </span>
+                <div class="form-check form-switch d-flex align-items-center justify-content-center">
+                    <input class="form-check-input" type="checkbox" role="switch" 
+                           id="switchCategoria${categoria.idCategoria}"
+                           ${categoria.estadoBD === 'ACTIVO' ? 'checked' : ''}
+                           onchange="toggleEstadoCategoria(${categoria.idCategoria}, this.checked)"
+                           title="${categoria.estadoBD === 'ACTIVO' ? 'Desactivar' : 'Activar'} categoría">
+                </div>
             </td>
             <td>
                 <div class="action-btns">
@@ -90,7 +103,6 @@ async function cargarDatosCategoria(id) {
             document.getElementById('categoriaId').value = categoria.idCategoria;
             document.getElementById('categoriaNombre').value = categoria.nombre;
             document.getElementById('categoriaDescripcion').value = categoria.descripcion;
-            document.getElementById('categoriaEstado').value = categoria.estadoBD;
         }
     } catch (error) {
         console.error('Error al cargar categoría:', error);
@@ -103,11 +115,57 @@ function editarCategoria(id) {
     openCategoriaModal('edit', id);
 }
 
-// Ver categoría
+// Ver categoría (modal Bootstrap)
 function verCategoria(id) {
     const categoria = categoriasData.find(c => c.idCategoria === id);
     if (categoria) {
-        alert(`Categoría: ${categoria.nombre}\nDescripción: ${categoria.descripcion}\nEstado: ${categoria.estadoBD}`);
+        document.getElementById('verCategoriaId').textContent = categoria.idCategoria;
+        document.getElementById('verCategoriaNombre').textContent = categoria.nombre;
+        document.getElementById('verCategoriaDescripcion').textContent = categoria.descripcion;
+        
+        const estadoBadge = document.getElementById('verCategoriaEstado');
+        estadoBadge.textContent = categoria.estadoBD === 'ACTIVO' ? 'Activo' : 'Inactivo';
+        estadoBadge.className = `badge ${categoria.estadoBD === 'ACTIVO' ? 'bg-success' : 'bg-secondary'}`;
+        
+        verCategoriaModal.show();
+    }
+}
+
+// Toggle estado de la categoría
+async function toggleEstadoCategoria(id, activo) {
+    const nuevoEstado = activo ? 'ACTIVO' : 'INACTIVO';
+    const categoria = categoriasData.find(c => c.idCategoria === id);
+    
+    if (!categoria) return;
+    
+    try {
+        const data = {
+            nombre: categoria.nombre,
+            descripcion: categoria.descripcion,
+            estadoBD: nuevoEstado
+        };
+
+        const response = await fetch(`/categoria/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showNotification(`Categoría ${activo ? 'activada' : 'desactivada'} exitosamente`, 'success');
+            cargarCategorias();
+        } else {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            showNotification('Error al cambiar estado', 'error');
+            document.getElementById(`switchCategoria${id}`).checked = !activo;
+        }
+    } catch (error) {
+        console.error('Error al cambiar estado:', error);
+        showNotification('Error al cambiar estado', 'error');
+        document.getElementById(`switchCategoria${id}`).checked = !activo;
     }
 }
 
@@ -122,10 +180,18 @@ async function saveCategoria() {
     }
 
     const id = document.getElementById('categoriaId').value;
+    
+    // Si es edición, mantener el estado actual; si es nuevo, ACTIVO por defecto
+    let estadoBD = 'ACTIVO';
+    if (id) {
+        const categoria = categoriasData.find(c => c.idCategoria == id);
+        estadoBD = categoria ? categoria.estadoBD : 'ACTIVO';
+    }
+    
     const data = {
         nombre: document.getElementById('categoriaNombre').value,
         descripcion: document.getElementById('categoriaDescripcion').value,
-        estadoBD: document.getElementById('categoriaEstado').value
+        estadoBD: estadoBD
     };
 
     try {
@@ -154,17 +220,28 @@ async function saveCategoria() {
     }
 }
 
-// Eliminar categoría
-async function eliminarCategoria(id) {
-    if (!confirm('¿Está seguro de eliminar esta categoría?')) return;
+// Eliminar categoría (abrir modal de confirmación)
+function eliminarCategoria(id) {
+    const categoria = categoriasData.find(c => c.idCategoria === id);
+    if (categoria) {
+        categoriaAEliminar = id;
+        document.getElementById('eliminarCategoriaNombre').textContent = categoria.nombre;
+        confirmarEliminarCategoriaModal.show();
+    }
+}
 
+// Confirmar eliminación de categoría
+async function confirmarEliminarCategoria() {
+    if (!categoriaAEliminar) return;
+    
     try {
-        const response = await fetch(`/categoria/${id}`, {
+        const response = await fetch(`/categoria/${categoriaAEliminar}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
             showNotification('Categoría eliminada exitosamente', 'success');
+            confirmarEliminarCategoriaModal.hide();
             cargarCategorias();
         } else {
             showNotification('Error al eliminar categoría', 'error');
@@ -172,6 +249,8 @@ async function eliminarCategoria(id) {
     } catch (error) {
         console.error('Error al eliminar categoría:', error);
         showNotification('Error al eliminar categoría', 'error');
+    } finally {
+        categoriaAEliminar = null;
     }
 }
 
@@ -213,6 +292,16 @@ function clearFilters() {
     renderCategorias(categoriasData);
 }
 
+// Formatear estado BD para mostrar
+function formatEstadoBD(estado) {
+    const nombres = {
+        'ACTIVO': 'Activo',
+        'INACTIVO': 'Inactivo',
+        'ELIMINADO': 'Eliminado'
+    };
+    return nombres[estado] || estado;
+}
+
 // Exportar categorías
 function exportCategorias() {
     showNotification('Función de exportación en desarrollo', 'info');
@@ -231,4 +320,3 @@ function showNotification(message, type = 'info') {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
-

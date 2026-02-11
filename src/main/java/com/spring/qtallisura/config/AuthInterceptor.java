@@ -119,8 +119,8 @@ public class AuthInterceptor implements HandlerInterceptor {
                path.equals("/login") ||
                path.equals("/admin") ||
                path.equals("/catalogo") ||
-               path.equals("/resenas") ||
                path.equals("/nosotros") ||
+               path.equals("/contacto") ||
                path.startsWith("/api/auth") ||
                path.startsWith("/css/") ||
                path.startsWith("/js/") ||

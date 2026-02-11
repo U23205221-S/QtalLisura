@@ -79,7 +79,12 @@ public class MesaService implements ServiceAbs<MesaRequestDTO, MesaResponseDTO> 
 
         Mesa model_actualizado = mesaMapper.toModel(dto);
         model_actualizado.setIdMesa(model_existente.getIdMesa());
-        model_actualizado.setEstadoBD(model_existente.getEstadoBD());
+        // Usar el estadoBD del DTO si viene, sino mantener el existente
+        if (dto.getEstadoBD() != null) {
+            model_actualizado.setEstadoBD(dto.getEstadoBD());
+        } else {
+            model_actualizado.setEstadoBD(model_existente.getEstadoBD());
+        }
 
         model_actualizado = mesaRepository.save(model_actualizado);
         return mesaMapper.toDTO(model_actualizado);

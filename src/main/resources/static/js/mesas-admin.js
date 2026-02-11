@@ -2,9 +2,18 @@
 
 let mesasData = [];
 let mesaModal;
+let verMesaModal;
+let confirmarEliminarMesaModal;
+let mesaAEliminar = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     mesaModal = new bootstrap.Modal(document.getElementById('mesaModal'));
+    verMesaModal = new bootstrap.Modal(document.getElementById('verMesaModal'));
+    confirmarEliminarMesaModal = new bootstrap.Modal(document.getElementById('confirmarEliminarMesaModal'));
+    
+    // Configurar botón de confirmación de eliminación
+    document.getElementById('btnConfirmarEliminarMesa').addEventListener('click', confirmarEliminarMesa);
+    
     cargarMesas();
     setupFilters();
 });
@@ -51,12 +60,19 @@ function renderMesas(mesas) {
                 </span>
             </td>
             <td>
-                <span class="status-badge ${mesa.estadoBD === 'ACTIVO' ? 'active' : 'inactive'}">
-                    ${mesa.estadoBD}
-                </span>
+                <div class="form-check form-switch d-flex align-items-center justify-content-center">
+                    <input class="form-check-input" type="checkbox" role="switch" 
+                           id="switchMesa${mesa.idMesa}"
+                           ${mesa.estadoBD === 'ACTIVO' ? 'checked' : ''}
+                           onchange="toggleEstadoMesa(${mesa.idMesa}, this.checked)"
+                           title="${mesa.estadoBD === 'ACTIVO' ? 'Desactivar' : 'Activar'} mesa">
+                </div>
             </td>
             <td>
                 <div class="action-btns">
+                    <button class="action-btn view" onclick="verMesa(${mesa.idMesa})" title="Ver detalles">
+                        <i class="bi bi-eye"></i>
+                    </button>
                     <button class="action-btn edit" onclick="editarMesa(${mesa.idMesa})" title="Editar">
                         <i class="bi bi-pencil"></i>
                     </button>
@@ -130,7 +146,6 @@ async function cargarDatosMesa(id) {
             document.getElementById('mesaCapacidad').value = mesa.capacidadMaxima;
             document.getElementById('mesaUbicacion').value = mesa.ubicacion;
             document.getElementById('mesaEstadoMesa').value = mesa.estadoMesa;
-            document.getElementById('mesaEstado').value = mesa.estadoBD;
         }
     } catch (error) {
         console.error('Error al cargar mesa:', error);
@@ -141,6 +156,67 @@ async function cargarDatosMesa(id) {
 // Editar mesa
 function editarMesa(id) {
     openMesaModal('edit', id);
+}
+
+// Ver mesa (modal Bootstrap)
+function verMesa(id) {
+    const mesa = mesasData.find(m => m.idMesa === id);
+    if (mesa) {
+        document.getElementById('verMesaNumero').textContent = `Mesa ${mesa.numeroMesa}`;
+        document.getElementById('verMesaId').textContent = mesa.idMesa;
+        document.getElementById('verMesaCapacidad').textContent = `${mesa.capacidadMaxima} personas`;
+        document.getElementById('verMesaUbicacion').textContent = formatUbicacion(mesa.ubicacion);
+        
+        const estadoMesaBadge = document.getElementById('verMesaEstadoMesa');
+        estadoMesaBadge.textContent = formatEstadoMesa(mesa.estadoMesa);
+        estadoMesaBadge.className = `badge ${getEstadoMesaClass(mesa.estadoMesa)}`;
+        
+        const estadoBadge = document.getElementById('verMesaEstado');
+        estadoBadge.textContent = mesa.estadoBD === 'ACTIVO' ? 'Activo' : 'Inactivo';
+        estadoBadge.className = `badge ${mesa.estadoBD === 'ACTIVO' ? 'bg-success' : 'bg-secondary'}`;
+        
+        verMesaModal.show();
+    }
+}
+
+// Toggle estado de la mesa
+async function toggleEstadoMesa(id, activo) {
+    const nuevoEstado = activo ? 'ACTIVO' : 'INACTIVO';
+    const mesa = mesasData.find(m => m.idMesa === id);
+    
+    if (!mesa) return;
+    
+    try {
+        const data = {
+            numeroMesa: mesa.numeroMesa,
+            capacidadMaxima: mesa.capacidadMaxima,
+            ubicacion: mesa.ubicacion,
+            estadoMesa: mesa.estadoMesa,
+            estadoBD: nuevoEstado
+        };
+
+        const response = await fetch(`/mesa/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showNotification(`Mesa ${activo ? 'activada' : 'desactivada'} exitosamente`, 'success');
+            cargarMesas();
+        } else {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            showNotification('Error al cambiar estado', 'error');
+            document.getElementById(`switchMesa${id}`).checked = !activo;
+        }
+    } catch (error) {
+        console.error('Error al cambiar estado:', error);
+        showNotification('Error al cambiar estado', 'error');
+        document.getElementById(`switchMesa${id}`).checked = !activo;
+    }
 }
 
 // Guardar mesa (crear o actualizar)
@@ -154,12 +230,20 @@ async function saveMesa() {
     }
 
     const id = document.getElementById('mesaId').value;
+    
+    // Si es edición, mantener el estado actual; si es nuevo, ACTIVO por defecto
+    let estadoBD = 'ACTIVO';
+    if (id) {
+        const mesa = mesasData.find(m => m.idMesa == id);
+        estadoBD = mesa ? mesa.estadoBD : 'ACTIVO';
+    }
+    
     const data = {
         numeroMesa: parseInt(document.getElementById('mesaNumero').value),
         capacidadMaxima: parseInt(document.getElementById('mesaCapacidad').value),
         ubicacion: document.getElementById('mesaUbicacion').value,
         estadoMesa: document.getElementById('mesaEstadoMesa').value,
-        estadoBD: document.getElementById('mesaEstado').value
+        estadoBD: estadoBD
     };
 
     try {
@@ -188,17 +272,28 @@ async function saveMesa() {
     }
 }
 
-// Eliminar mesa
-async function eliminarMesa(id) {
-    if (!confirm('¿Está seguro de eliminar esta mesa?')) return;
+// Eliminar mesa (abrir modal de confirmación)
+function eliminarMesa(id) {
+    const mesa = mesasData.find(m => m.idMesa === id);
+    if (mesa) {
+        mesaAEliminar = id;
+        document.getElementById('eliminarMesaNombre').textContent = `Mesa ${mesa.numeroMesa}`;
+        confirmarEliminarMesaModal.show();
+    }
+}
 
+// Confirmar eliminación de mesa
+async function confirmarEliminarMesa() {
+    if (!mesaAEliminar) return;
+    
     try {
-        const response = await fetch(`/mesa/${id}`, {
+        const response = await fetch(`/mesa/${mesaAEliminar}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
             showNotification('Mesa eliminada exitosamente', 'success');
+            confirmarEliminarMesaModal.hide();
             cargarMesas();
         } else {
             showNotification('Error al eliminar mesa', 'error');
@@ -206,6 +301,8 @@ async function eliminarMesa(id) {
     } catch (error) {
         console.error('Error al eliminar mesa:', error);
         showNotification('Error al eliminar mesa', 'error');
+    } finally {
+        mesaAEliminar = null;
     }
 }
 
@@ -250,6 +347,16 @@ function clearFilters() {
     renderMesas(mesasData);
 }
 
+// Formatear estado BD para mostrar
+function formatEstadoBD(estado) {
+    const nombres = {
+        'ACTIVO': 'Activo',
+        'INACTIVO': 'Inactivo',
+        'ELIMINADO': 'Eliminado'
+    };
+    return nombres[estado] || estado;
+}
+
 // Notificaciones
 function showNotification(message, type = 'info') {
     const toast = document.createElement('div');
@@ -263,4 +370,3 @@ function showNotification(message, type = 'info') {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
-

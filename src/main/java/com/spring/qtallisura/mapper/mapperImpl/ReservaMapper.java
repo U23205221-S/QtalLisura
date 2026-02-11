@@ -21,8 +21,8 @@ public interface ReservaMapper extends Convert<Reserva, ReservaRequestDTO, Reser
     @Mapping(target = "clienteNombre", expression = "java(model.getIdCliente().getNombre() + \" \" + model.getIdCliente().getApellido())")
     @Mapping(target = "idMesa", source = "idMesa.idMesa")
     @Mapping(target = "numeroMesa", source = "idMesa.numeroMesa")
-    @Mapping(target = "estadoSolicitud", source = "estadoSolicitud.estado")
-    @Mapping(target = "estadoBD", source = "estadoBD.nombre")
+    @Mapping(target = "estadoSolicitud", expression = "java(model.getEstadoSolicitud().name())")
+    @Mapping(target = "estadoBD", expression = "java(model.getEstadoBD().name())")
     @Override
     ReservaResponseDTO toDTO(Reserva model);
 

@@ -16,9 +16,9 @@ import org.mapstruct.ReportingPolicy;
 public interface MesaMapper extends Convert<Mesa, MesaRequestDTO, MesaResponseDTO>,
         UpdatePatch<MesaRequestDTO, Mesa> {
 
-    @Mapping(target = "estadoMesa", source = "estadoMesa.estado")
-    @Mapping(target = "ubicacion", source = "ubicacion.ubicacion")
-    @Mapping(target = "estadoBD", source = "estadoBD.nombre")
+    @Mapping(target = "estadoMesa", expression = "java(model.getEstadoMesa().name())")
+    @Mapping(target = "ubicacion", expression = "java(model.getUbicacion().name())")
+    @Mapping(target = "estadoBD", expression = "java(model.getEstadoBD().name())")
     @Override
     MesaResponseDTO toDTO(Mesa model);
 

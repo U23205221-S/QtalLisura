@@ -3,13 +3,17 @@ package com.spring.qtallisura.dto.request;
 import com.spring.qtallisura.model.EstadoBD;
 import com.spring.qtallisura.model.Mesa;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MesaRequestDTO {
 
     @NotNull(message = "El número de mesa es obligatorio")
