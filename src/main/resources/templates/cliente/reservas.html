@@ -13,82 +13,228 @@
 <body>
     <div th:replace="~{fragments/layout-cliente :: layout-cliente(~{::content})}">
         <th:block th:fragment="content">
-            <section class="hero-reservas py-5" style="background: linear-gradient(135deg, var(--primary-orange) 0%, #4a2c2a 100%);">
-                <div class="container text-center text-white py-4">
-                    <h1 class="display-4 fw-bold mb-3"><i class="bi bi-calendar-check me-3"></i>Reserva tu Mesa</h1>
-                    <p class="lead mb-0">Asegura tu lugar para disfrutar de la mejor gastronomía peruana</p>
-                </div>
-            </section>
-            <section class="py-5">
+            <!-- Formulario de Reserva -->
+            <section class="carousel-section">
                 <div class="container">
+                    <h2 class="section-title text-center">Completa tu Reserva</h2>
+                    <p class="text-center text-muted mb-5">Solo te tomara un minuto asegurar tu experiencia gastronomica</p>
                     <div class="row justify-content-center">
                         <div class="col-lg-8">
-                            <div class="card shadow-lg border-0">
-                                <div class="card-header bg-white py-4 border-0">
-                                    <h4 class="mb-0 text-center"><i class="bi bi-pencil-square text-primary me-2"></i>Completa tu Reserva</h4>
-                                </div>
-                                <div class="card-body p-4 p-md-5">
-                                    <form id="reservaForm" class="needs-validation" novalidate>
-                                        <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-person-circle me-2"></i>Datos del Cliente</h5>
-                                        <div class="row mb-4">
-                                            <div class="col-md-6 mb-3">
+                            <div class="reserva-form-card">
+                                <form id="reservaForm" class="needs-validation" novalidate>
+                                    <!-- Datos del Cliente -->
+                                    <div class="form-section">
+                                        <div class="form-section-header">
+                                            <div class="form-section-icon">
+                                                <i class="bi bi-person-circle"></i>
+                                            </div>
+                                            <h5>Datos del Cliente</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
                                                 <label for="clienteNombre" class="form-label">Nombre Completo *</label>
-                                                <input type="text" class="form-control form-control-lg" id="clienteNombre" placeholder="Tu nombre completo" required>
+                                                <div class="input-group input-group-lg">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-orange"></i></span>
+                                                    <input type="text" class="form-control border-start-0" id="clienteNombre" placeholder="Tu nombre completo" required>
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="clienteTelefono" class="form-label">Teléfono *</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">+51</span>
-                                                    <input type="tel" class="form-control form-control-lg" id="clienteTelefono" placeholder="999888777" maxlength="9" pattern="[0-9]{9}" required>
+                                                <label for="clienteTelefono" class="form-label">Telefono *</label>
+                                                <div class="input-group input-group-lg">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-phone text-orange"></i></span>
+                                                    <span class="input-group-text bg-light border-start-0 border-end-0">+51</span>
+                                                    <input type="tel" class="form-control border-start-0" id="clienteTelefono" placeholder="999 888 777" maxlength="9" pattern="[0-9]{9}" required>
                                                 </div>
                                             </div>
                                         </div>
-                                        <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-calendar-event me-2"></i>Detalles de la Reserva</h5>
-                                        <div class="row mb-4">
-                                            <div class="col-md-6 mb-3">
+                                    </div>
+
+                                    <!-- Detalles de Reserva -->
+                                    <div class="form-section">
+                                        <div class="form-section-header">
+                                            <div class="form-section-icon">
+                                                <i class="bi bi-calendar-event"></i>
+                                            </div>
+                                            <h5>Detalles de la Reserva</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
                                                 <label for="fechaHora" class="form-label">Fecha y Hora *</label>
-                                                <input type="datetime-local" class="form-control form-control-lg" id="fechaHora" required>
+                                                <div class="input-group input-group-lg">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar3 text-orange"></i></span>
+                                                    <input type="datetime-local" class="form-control border-start-0" id="fechaHora" required>
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="cantidadPersonas" class="form-label">Cantidad de Personas *</label>
-                                                <select class="form-select form-select-lg" id="cantidadPersonas" required>
-                                                    <option value="">Selecciona...</option>
-                                                    <option value="1">1 persona</option>
-                                                    <option value="2">2 personas</option>
-                                                    <option value="3">3 personas</option>
-                                                    <option value="4">4 personas</option>
-                                                    <option value="5">5 personas</option>
-                                                    <option value="6">6 personas</option>
-                                                    <option value="8">8 personas</option>
-                                                    <option value="10">10+ personas</option>
-                                                </select>
+                                                <div class="input-group input-group-lg">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-people text-orange"></i></span>
+                                                    <select class="form-select border-start-0" id="cantidadPersonas" required>
+                                                        <option value="">Selecciona...</option>
+                                                        <option value="1">1 persona</option>
+                                                        <option value="2">2 personas</option>
+                                                        <option value="3">3 personas</option>
+                                                        <option value="4">4 personas</option>
+                                                        <option value="5">5 personas</option>
+                                                        <option value="6">6 personas</option>
+                                                        <option value="8">8 personas</option>
+                                                        <option value="10">10+ personas</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="mesaSelect" class="form-label">Mesa Disponible *</label>
-                                            <select class="form-select form-select-lg" id="mesaSelect" required>
+                                    </div>
+
+                                    <!-- Seleccion de Mesa -->
+                                    <div class="form-section">
+                                        <div class="form-section-header">
+                                            <div class="form-section-icon">
+                                                <i class="bi bi-grid-3x3-gap"></i>
+                                            </div>
+                                            <h5>Selecciona tu Mesa</h5>
+                                        </div>
+                                        <div class="input-group input-group-lg mb-2">
+                                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-layout-wtf text-orange"></i></span>
+                                            <select class="form-select border-start-0" id="mesaSelect" required>
                                                 <option value="">Selecciona una mesa...</option>
                                             </select>
-                                            <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Solo mesas disponibles con capacidad suficiente</small>
                                         </div>
-                                        <div class="mb-4">
-                                            <label for="notasEspeciales" class="form-label">Notas Especiales (opcional)</label>
-                                            <textarea class="form-control" id="notasEspeciales" rows="3" placeholder="Solicitudes especiales..." maxlength="300"></textarea>
+                                        <small class="text-muted d-flex align-items-center gap-1">
+                                            <i class="bi bi-info-circle"></i>
+                                            Solo mesas disponibles con capacidad suficiente
+                                        </small>
+                                    </div>
+
+                                    <!-- Notas Especiales -->
+                                    <div class="form-section">
+                                        <div class="form-section-header">
+                                            <div class="form-section-icon">
+                                                <i class="bi bi-chat-left-text"></i>
+                                            </div>
+                                            <h5>Notas Especiales <span class="text-muted fw-normal">(opcional)</span></h5>
                                         </div>
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-gastro btn-lg py-3"><i class="bi bi-check-circle me-2"></i>Confirmar Reserva</button>
-                                        </div>
-                                        <div id="reservaMessage" class="alert mt-4 d-none"></div>
-                                    </form>
-                                </div>
+                                        <textarea class="form-control form-control-lg" id="notasEspeciales" rows="3" placeholder="Cumpleanos, aniversario, preferencias alimenticias, alergias..." maxlength="300"></textarea>
+                                        <small class="text-muted">Maximo 300 caracteres</small>
+                                    </div>
+
+                                    <!-- Boton Submit -->
+                                    <div class="d-grid mt-4">
+                                        <button type="submit" class="btn btn-gastro btn-lg py-3">
+                                            <i class="bi bi-check-circle me-2"></i>Confirmar Reserva
+                                        </button>
+                                    </div>
+
+                                    <!-- Mensaje de resultado -->
+                                    <div id="reservaMessage" class="alert mt-4 d-none"></div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <!-- CTA Section - Coherente con Index -->
+            <section class="content-section bg-orange-gradient text-center text-white">
+                <div class="container">
+                    <h2 class="mb-3">Tienes Alguna Pregunta?</h2>
+                    <p class="mb-4 opacity-75">Nuestro equipo esta disponible para ayudarte con cualquier consulta sobre tu reserva</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="tel:+51999888777" class="btn btn-gastro-dark btn-lg">
+                            <i class="bi bi-telephone me-2"></i>Llamar Ahora
+                        </a>
+                        <a th:href="@{/catalogo}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-grid me-2"></i>Ver Catalogo
+                        </a>
+                    </div>
+                </div>
+            </section>
         </th:block>
     </div>
+
+    <style>
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.2);
+        }
+
+        /* Formulario de Reserva Card */
+        .reserva-form-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-gray);
+        }
+
+        /* Secciones del Formulario */
+        .form-section {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .form-section-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--light-orange-bg), var(--cream));
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--primary-orange);
+        }
+
+        .form-section-header h5 {
+            margin: 0;
+            color: var(--dark-black);
+            font-weight: 600;
+        }
+
+        /* Input Styles */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 0.25rem rgba(242, 101, 34, 0.15);
+        }
+
+        .input-group-text {
+            border-color: var(--border-gray);
+        }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary-orange);
+        }
+
+        .text-orange {
+            color: var(--primary-orange) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .reserva-form-card {
+                padding: 24px;
+            }
+
+            .form-section-header h5 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+
     <script th:src="@{/js/reservas-cliente.js}"></script>
 </body>
 </html>
-
