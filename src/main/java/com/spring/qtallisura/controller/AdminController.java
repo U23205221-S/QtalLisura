@@ -105,5 +105,19 @@ public class AdminController {
 
         return "admin/reservas";
     }
-}
 
+    @GetMapping("/pedidos")
+    public String pedidos(Model model, HttpSession session) {
+        log.info("AdminController.pedidos()");
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("usuarioLogueado", usuario);
+        model.addAttribute("currentPath", "/admin/pedidos");
+
+        return "admin/pedidos";
+    }
+}

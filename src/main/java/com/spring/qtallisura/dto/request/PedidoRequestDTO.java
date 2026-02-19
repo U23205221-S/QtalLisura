@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Builder
 public class PedidoRequestDTO {
 
-    @NotNull(message = "El id del cliente es obligatorio")
     private Integer idCliente;
     @NotNull(message = "El id del usuario es obligatorio")
     private Integer idUsuario;

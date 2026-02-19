@@ -167,7 +167,12 @@ public class AuthController {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario != null) {
             log.info("Logout de usuario: {}", usuario.getUsername());
-            redirectUrl = "/admin"; // Redirigir a la página de login de admin
+            String perfil = usuario.getIdPerfil().getNombre();
+            if ("Mesero".equalsIgnoreCase(perfil)) {
+                redirectUrl = "/mesero-login";
+            } else {
+                redirectUrl = "/admin"; // Redirigir a la página de login de admin
+            }
         }
 
         // Verificar si es un cliente
@@ -251,6 +256,10 @@ public class AuthController {
 
         if ("Administrador".equalsIgnoreCase(perfil)) {
             return "/admin/dashboard";
+        }
+
+        if ("Mesero".equalsIgnoreCase(perfil)) {
+            return "/mesero/dashboard";
         }
 
         return "/catalogo"; // Por defecto para clientes

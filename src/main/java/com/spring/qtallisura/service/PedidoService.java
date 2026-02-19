@@ -38,14 +38,21 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
             throw new EServiceLayer("El código del pedido ya está registrado en el sistema");
         }
 
-        Cliente cliente = clienteRepository.findById(dto.getIdCliente())
-                .orElseThrow(() -> new EServiceLayer("El cliente no existe"));
+        Cliente cliente = null;
+        if (dto.getIdCliente() != null) {
+            cliente = clienteRepository.findById(dto.getIdCliente())
+                    .orElseThrow(() -> new EServiceLayer("El cliente no existe"));
+        }
 
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                 .orElseThrow(() -> new EServiceLayer("El usuario no existe"));
 
         Mesa mesa = mesaRepository.findById(dto.getIdMesa())
                 .orElseThrow(() -> new EServiceLayer("La mesa no existe"));
+
+        if (mesa.getEstadoMesa() != Mesa.EstadoMesa.DISPONIBLE) {
+            throw new EServiceLayer("La mesa no está disponible. Estado actual: " + mesa.getEstadoMesa().getEstado());
+        }
 
         Pedido model = pedidoMapper.toModel(dto);
         model.setIdCliente(cliente);
@@ -54,6 +61,11 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
         model.setEstadoBD(EstadoBD.ACTIVO);
 
         model = pedidoRepository.save(model);
+
+        // Marcar mesa como OCUPADA
+        mesa.setEstadoMesa(Mesa.EstadoMesa.OCUPADA);
+        mesaRepository.save(mesa);
+
         return pedidoMapper.toDTO(model);
     }
 
@@ -62,6 +74,15 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
     public List<PedidoResponseDTO> allList() {
         log.info("PedidoService.allList()");
         return pedidoRepository.findAll().stream()
+                .filter(pedido -> pedido.getEstadoBD() != EstadoBD.ELIMINADO)
+                .map(pedidoMapper::toDTO)
+                .toList();
+    }
+
+    @Transactional
+    public List<PedidoResponseDTO> findByUsuario(Integer idUsuario) {
+        log.info("PedidoService.findByUsuario() - idUsuario: {}", idUsuario);
+        return pedidoRepository.findByIdUsuario_IdUsuario(idUsuario).stream()
                 .filter(pedido -> pedido.getEstadoBD() != EstadoBD.ELIMINADO)
                 .map(pedidoMapper::toDTO)
                 .toList();
@@ -121,6 +142,15 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
 
         if (dto.getEstadoPedido() != null) {
             model_existente.setEstadoPedido(dto.getEstadoPedido());
+            // Liberar mesa si el pedido pasa a PAGADO o CANCELADO
+            if (dto.getEstadoPedido() == Pedido.EstadoPedido.PAGADO
+                    || dto.getEstadoPedido() == Pedido.EstadoPedido.CANCELADO) {
+                Mesa mesaActual = model_existente.getIdMesa();
+                if (mesaActual != null) {
+                    mesaActual.setEstadoMesa(Mesa.EstadoMesa.DISPONIBLE);
+                    mesaRepository.save(mesaActual);
+                }
+            }
         }
 
         if (dto.getTotal() != null) {

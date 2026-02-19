@@ -29,6 +29,9 @@ public class SecurityConfig {
                 // Recursos estáticos públicos
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
 
+                // Login de admin y mesero
+                .requestMatchers("/admin", "/mesero-login").permitAll()
+
                 // Páginas públicas del cliente
                 .requestMatchers("/", "/catalogo", "/nosotros", "/contacto", "/resenas").permitAll()
 

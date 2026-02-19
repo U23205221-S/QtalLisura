@@ -48,6 +48,15 @@ public class MesaService implements ServiceAbs<MesaRequestDTO, MesaResponseDTO> 
     }
 
     @Transactional
+    public List<MesaResponseDTO> findByEstado(Mesa.EstadoMesa estado) {
+        log.info("MesaService.findByEstado() - estado: {}", estado);
+        return mesaRepository.findByEstadoMesa(estado).stream()
+                .filter(mesa -> mesa.getEstadoBD() != EstadoBD.ELIMINADO)
+                .map(mesaMapper::toDTO)
+                .toList();
+    }
+
+    @Transactional
     @Override
     public MesaResponseDTO readById(Integer id) {
         log.info("MesaService.readById()");

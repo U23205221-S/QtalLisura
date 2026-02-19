@@ -30,6 +30,13 @@ public class PedidoController {
         return ResponseEntity.ok(pedidos);
     }
 
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<Iterable<PedidoResponseDTO>> getPedidosByUsuario(@PathVariable Integer idUsuario) {
+        log.info("Recibida solicitud para obtener pedidos del usuario: {}", idUsuario);
+        Iterable<PedidoResponseDTO> pedidos = pedidoService.findByUsuario(idUsuario);
+        return ResponseEntity.ok(pedidos);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> readById(@PathVariable Integer id) {
         log.info("Recibida solicitud para obtener un pedido por su ID");

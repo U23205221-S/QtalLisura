@@ -17,7 +17,7 @@ import org.mapstruct.ReportingPolicy;
 public interface PedidoMapper extends Convert<Pedido, PedidoRequestDTO, PedidoResponseDTO>,
         UpdatePatch<PedidoRequestDTO, Pedido> {
 
-    @Mapping(target = "clienteNombre", expression = "java(model.getIdCliente().getNombre() + \" \" + model.getIdCliente().getApellido())")
+    @Mapping(target = "clienteNombre", expression = "java(model.getIdCliente() != null ? model.getIdCliente().getNombre() + \" \" + model.getIdCliente().getApellido() : \"Consumidor Final\")")
     @Mapping(target = "usuarioNombre", expression = "java(model.getIdUsuario().getNombres() + \" \" + model.getIdUsuario().getApellidos())")
     @Mapping(target = "numeroMesa", source = "idMesa.numeroMesa")
     @Mapping(target = "estadoPedido", source = "estadoPedido.estado")

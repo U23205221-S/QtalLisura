@@ -32,16 +32,24 @@ public class DataLoader implements CommandLineRunner {
         // 1. Crear Módulos
         Modulo moduloDashboard = createModuloIfNotExists("Dashboard", "Panel de control principal con estadísticas");
         Modulo moduloProductos = createModuloIfNotExists("Productos", "Gestión de productos y catálogo");
+        Modulo moduloPedidos = createModuloIfNotExists("Pedidos", "Gestión de pedidos del restaurante");
 
-        // 2. Crear Perfil
+        // 2. Crear Perfiles
         Perfil perfilAdmin = createPerfilIfNotExists("Administrador", "Perfil con acceso completo al sistema");
+        Perfil perfilMesero = createPerfilIfNotExists("Mesero", "Perfil para meseros del restaurante");
 
-        // 3. Asignar Módulos al Perfil
+        // 3. Asignar Módulos al Perfil Administrador
         assignModuleToProfile(perfilAdmin, moduloDashboard);
         assignModuleToProfile(perfilAdmin, moduloProductos);
+        assignModuleToProfile(perfilAdmin, moduloPedidos);
 
-        // 4. Crear Usuario Administrador
+        // 3.1 Asignar Módulos al Perfil Mesero
+        assignModuleToProfile(perfilMesero, moduloDashboard);
+        assignModuleToProfile(perfilMesero, moduloPedidos);
+
+        // 4. Crear Usuarios
         createAdminUserIfNotExists(perfilAdmin);
+        createMeseroUserIfNotExists(perfilMesero);
 
         // 5. Crear Categorías
         Categoria categoriaEntradas = createCategoriaIfNotExists("Entradas", "Platos de entrada y aperitivos");
@@ -127,6 +135,25 @@ public class DataLoader implements CommandLineRunner {
             admin = usuarioRepository.save(admin);
             log.info("✓ Usuario administrador creado - Username: admin, Password: 123456");
             return admin;
+        });
+    }
+
+    private void createMeseroUserIfNotExists(Perfil perfil) {
+        usuarioRepository.findByUsername("mesero").orElseGet(() -> {
+            Usuario mesero = Usuario.builder()
+                    .nombres("Mesero")
+                    .apellidos("Sistema")
+                    .DNI("87654321")
+                    .username("mesero")
+                    .contrasena(passwordEncoder.encode("123456"))
+                    .idPerfil(perfil)
+                    .fechaRegistro(LocalDateTime.now())
+                    .imagenUrl("default-admin.jpg")
+                    .estadoBD(EstadoBD.ACTIVO)
+                    .build();
+            mesero = usuarioRepository.save(mesero);
+            log.info("✓ Usuario mesero creado - Username: mesero, Password: 123456");
+            return mesero;
         });
     }
 

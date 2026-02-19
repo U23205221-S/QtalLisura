@@ -69,5 +69,11 @@ public class HomeController {
         log.info("HomeController.admin() - Renderizando página de admin login");
         return "auth/admin";
     }
+
+    @GetMapping("/mesero-login")
+    public String meseroLogin() {
+        log.info("HomeController.meseroLogin() - Renderizando página de mesero login");
+        return "auth/mesero";
+    }
 }
 

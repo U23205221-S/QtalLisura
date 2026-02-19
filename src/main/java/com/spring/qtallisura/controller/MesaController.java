@@ -2,6 +2,7 @@ package com.spring.qtallisura.controller;
 
 import com.spring.qtallisura.dto.request.MesaRequestDTO;
 import com.spring.qtallisura.dto.response.MesaResponseDTO;
+import com.spring.qtallisura.model.Mesa;
 import com.spring.qtallisura.service.MesaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,13 @@ public class MesaController {
     public ResponseEntity<Iterable<MesaResponseDTO>> getAllMesas() {
         log.info("Recibida solicitud para obtener todas las mesas");
         Iterable<MesaResponseDTO> mesas = mesaService.allList();
+        return ResponseEntity.ok(mesas);
+    }
+
+    @GetMapping("/disponibles")
+    public ResponseEntity<Iterable<MesaResponseDTO>> getMesasDisponibles() {
+        log.info("Recibida solicitud para obtener mesas disponibles");
+        Iterable<MesaResponseDTO> mesas = mesaService.findByEstado(Mesa.EstadoMesa.DISPONIBLE);
         return ResponseEntity.ok(mesas);
     }
 

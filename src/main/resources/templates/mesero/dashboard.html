@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Q'Tal Lisura - Mesero</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/variables.css}" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/layout-mesero :: layout-mesero(~{::content})}">
+        <th:block th:fragment="content">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">Dashboard Mesero</h2>
+                    <p class="text-muted mb-0">Bienvenido, <span th:text="${usuarioLogueado.nombres}">Mesero</span>. Resumen de tus pedidos.</p>
+                </div>
+                <div>
+                    <span class="badge bg-orange-gradient py-2 px-3">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'dd MMM yyyy')}">22 Ene 2024</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                        <h3 th:text="${totalPedidos != null ? totalPedidos : 0}">0</h3>
+                        <p>Total Pedidos</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <h3 th:text="${pendientes != null ? pendientes : 0}">0</h3>
+                        <p>Pendientes</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card info">
+                        <div class="stat-icon blue">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                        <h3 th:text="${enPreparacion != null ? enPreparacion : 0}">0</h3>
+                        <p>En Preparación</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card success">
+                        <div class="stat-icon green">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <h3 th:text="${servidos != null ? servidos : 0}">0</h3>
+                        <p>Servidos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row g-4">
+                <div class="col-xl-6">
+                    <div class="chart-card">
+                        <h5 class="mb-3"><i class="bi bi-lightning-fill text-warning me-2"></i>Acciones Rápidas</h5>
+                        <div class="d-grid gap-3">
+                            <a th:href="@{/mesero/pedidos}" class="btn btn-lg btn-outline-primary d-flex align-items-center gap-2">
+                                <i class="bi bi-plus-circle-fill"></i>
+                                <span>Crear Nuevo Pedido</span>
+                            </a>
+                            <a th:href="@{/mesero/pedidos}" class="btn btn-lg btn-outline-success d-flex align-items-center gap-2">
+                                <i class="bi bi-list-check"></i>
+                                <span>Ver Mis Pedidos</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6">
+                    <div class="chart-card">
+                        <h5 class="mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Resumen</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td><i class="bi bi-circle-fill text-warning me-2"></i>Pendientes</td>
+                                        <td class="text-end fw-bold" th:text="${pendientes != null ? pendientes : 0}">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-circle-fill text-info me-2"></i>En Preparación</td>
+                                        <td class="text-end fw-bold" th:text="${enPreparacion != null ? enPreparacion : 0}">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-circle-fill text-success me-2"></i>Servidos</td>
+                                        <td class="text-end fw-bold" th:text="${servidos != null ? servidos : 0}">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-circle-fill text-secondary me-2"></i>Pagados</td>
+                                        <td class="text-end fw-bold" th:text="${pagados != null ? pagados : 0}">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </div>
+</body>
+</html>
+
