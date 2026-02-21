@@ -378,28 +378,6 @@
     transform: translateY(-2px);
 }
 
-.notification-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: linear-gradient(135deg, var(--danger), #EF4444);
-    color: var(--white);
-    font-size: 0.6rem;
-    width: 18px;
-    height: 18px;
-    border-radius: var(--border-radius-full);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.4);
-    animation: pulse-badge 2s infinite;
-}
-
-@keyframes pulse-badge {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
 
 /* Contenido */
 .admin-content {
@@ -857,16 +835,112 @@
     }
 
     .stat-card {
-        padding: 20px;
+        padding: 16px 12px;
     }
 
     .stat-card h3 {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+    }
+
+    .stat-card p {
+        font-size: 0.75rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+
+    .table-gastro {
+        font-size: 0.85rem;
     }
 
     .table-gastro thead th,
     .table-gastro tbody td {
-        padding: 12px 16px;
+        padding: 10px 8px;
+    }
+
+    .chart-card {
+        padding: 16px;
+    }
+
+    .chart-card h5 {
+        font-size: 1rem;
+    }
+
+    /* Make badges smaller on mobile */
+    .badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    /* Compact buttons on mobile */
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+    }
+
+    /* Modal adjustments */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    /* Table responsive adjustments */
+    .table-responsive {
+        border: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-content {
+        padding: 16px;
+    }
+
+    .stat-card {
+        padding: 12px 10px;
+    }
+
+    .stat-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .stat-card p {
+        font-size: 0.7rem;
+        margin-bottom: 0;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .chart-card {
+        padding: 12px;
+    }
+
+    /* Hide long text in tables */
+    .table-gastro td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    /* Stack modal buttons */
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+        margin-left: 0 !important;
     }
 }
 
@@ -956,4 +1030,66 @@
 .dropdown-gastro .dropdown-item i {
     width: 20px;
     text-align: center;
+}
+
+/* =============================================
+   Notificaciones y Alertas - Estado de Pedidos
+   ============================================= */
+
+/* Animación fade-out para alertas */
+.alert.fade-out {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Estilos mejorados para alertas de estado */
+#alertContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1060;
+    max-width: 400px;
+    width: 100%;
+}
+
+#alertContainer .alert {
+    margin-bottom: 10px;
+    border: none;
+    border-radius: var(--border-radius-md);
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Modal de confirmación de estado */
+#confirmEstadoModal .modal-content {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+#confirmEstadoModal .modal-header {
+    border-bottom: none;
+}
+
+#confirmEstadoModal .modal-footer {
+    border-top: none;
+    padding-top: 0;
+}
+
+/* Spinner en botones */
+.btn .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
 }

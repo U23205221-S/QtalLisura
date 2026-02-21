@@ -104,15 +104,19 @@ function limpiarFiltros() {
 
 async function verDetalle(idPedido) {
     try {
-        const response = await fetch(`/pedido/${idPedido}`);
-        const pedido = await response.json();
+        const [pedidoRes, detallesRes] = await Promise.all([
+            fetch(`/pedido/${idPedido}`),
+            fetch(`/detalle-pedido/pedido/${idPedido}`)
+        ]);
 
-        const detallesResp = await fetch('/detalle-pedido');
-        const todosDetalles = await detallesResp.json();
-        const detalles = Array.isArray(todosDetalles) ? todosDetalles.filter(d => d.idPedido === idPedido) : [];
+        if (!pedidoRes.ok) throw new Error('No se pudo obtener el pedido');
+        if (!detallesRes.ok) throw new Error('No se pudo obtener los productos del pedido');
+
+        const pedido   = await pedidoRes.json();
+        const detalles = await detallesRes.json();
 
         let detallesHtml = '';
-        if (detalles.length > 0) {
+        if (Array.isArray(detalles) && detalles.length > 0) {
             detallesHtml = `<table class="table table-sm">
                 <thead><tr><th>Producto</th><th>Cant.</th><th>P.Unit.</th><th>Subtotal</th></tr></thead>
                 <tbody>${detalles.map(d => `<tr>

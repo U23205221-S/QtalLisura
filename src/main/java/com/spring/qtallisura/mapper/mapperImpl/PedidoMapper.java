@@ -25,16 +25,16 @@ public interface PedidoMapper extends Convert<Pedido, PedidoRequestDTO, PedidoRe
     @Override
     PedidoResponseDTO toDTO(Pedido model);
 
-    @Mapping(target = "idCliente.idCliente", source = "idCliente")
-    @Mapping(target = "idUsuario.idUsuario", source = "idUsuario")
-    @Mapping(target = "idMesa.idMesa", source = "idMesa")
+    @Mapping(target = "idCliente", ignore = true)
+    @Mapping(target = "idUsuario", ignore = true)
+    @Mapping(target = "idMesa", ignore = true)
     @Override
     Pedido toModel(PedidoRequestDTO dto);
 
     @Override
-    @Mapping(target = "idCliente.idCliente", source = "idCliente")
-    @Mapping(target = "idUsuario.idUsuario", source = "idUsuario")
-    @Mapping(target = "idMesa.idMesa", source = "idMesa")
+    @Mapping(target = "idCliente", ignore = true)
+    @Mapping(target = "idUsuario", ignore = true)
+    @Mapping(target = "idMesa", ignore = true)
     void updateFromDto(PedidoRequestDTO dto, @MappingTarget Pedido entity);
 }
 

@@ -26,6 +26,7 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
     private final ClienteRepository clienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final MesaRepository mesaRepository;
+    private final DetallePedidoService detallePedidoService;
 
     @Transactional
     @Override
@@ -141,6 +142,15 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
         }
 
         if (dto.getEstadoPedido() != null) {
+            // Validar transición de estado
+            validarTransicionEstado(model_existente.getEstadoPedido(), dto.getEstadoPedido());
+
+            // Si el pedido se cancela, devolver el stock de todos los productos
+            if (dto.getEstadoPedido() == Pedido.EstadoPedido.CANCELADO) {
+                log.info("Pedido {} cancelado - devolviendo stock de productos", id);
+                detallePedidoService.devolverStockPorPedido(id);
+            }
+
             model_existente.setEstadoPedido(dto.getEstadoPedido());
             // Liberar mesa si el pedido pasa a PAGADO o CANCELADO
             if (dto.getEstadoPedido() == Pedido.EstadoPedido.PAGADO
@@ -182,5 +192,63 @@ public class PedidoService implements ServiceAbs<PedidoRequestDTO, PedidoRespons
                             }
                         }
                 );
+    }
+
+    /**
+     * Valida que la transición de estado sea válida según el flujo de negocio:
+     * PENDIENTE -> EN_PREPARACION -> SERVIDO -> PAGADO
+     * En cualquier estado se puede pasar a CANCELADO (excepto PAGADO)
+     */
+    private void validarTransicionEstado(Pedido.EstadoPedido estadoActual, Pedido.EstadoPedido nuevoEstado) {
+        log.info("Validando transición de estado: {} -> {}", estadoActual, nuevoEstado);
+
+        // Si el estado no cambia, no hay nada que validar
+        if (estadoActual == nuevoEstado) {
+            return;
+        }
+
+        // No se puede cambiar el estado de un pedido PAGADO
+        if (estadoActual == Pedido.EstadoPedido.PAGADO) {
+            throw new EServiceLayer("No se puede cambiar el estado de un pedido que ya fue pagado");
+        }
+
+        // No se puede cambiar el estado de un pedido CANCELADO
+        if (estadoActual == Pedido.EstadoPedido.CANCELADO) {
+            throw new EServiceLayer("No se puede cambiar el estado de un pedido cancelado");
+        }
+
+        // Se puede cancelar desde cualquier estado (excepto PAGADO que ya se validó arriba)
+        if (nuevoEstado == Pedido.EstadoPedido.CANCELADO) {
+            return;
+        }
+
+        // Validar transiciones válidas según el flujo
+        switch (estadoActual) {
+            case PENDIENTE:
+                if (nuevoEstado != Pedido.EstadoPedido.EN_PREPARACION) {
+                    throw new EServiceLayer(
+                        "Un pedido PENDIENTE solo puede pasar a EN_PREPARACION");
+                }
+                break;
+
+            case EN_PREPARACION:
+                if (nuevoEstado != Pedido.EstadoPedido.SERVIDO) {
+                    throw new EServiceLayer(
+                        "Un pedido EN_PREPARACION solo puede pasar a SERVIDO");
+                }
+                break;
+
+            case SERVIDO:
+                if (nuevoEstado != Pedido.EstadoPedido.PAGADO) {
+                    throw new EServiceLayer(
+                        "Un pedido SERVIDO solo puede pasar a PAGADO");
+                }
+                break;
+
+            default:
+                throw new EServiceLayer("Estado actual no válido: " + estadoActual);
+        }
+
+        log.info("Transición de estado válida: {} -> {}", estadoActual, nuevoEstado);
     }
 }

@@ -34,11 +34,6 @@ public class HomeController {
         return "cliente/catalogo";
     }
 
-    @GetMapping("/resenas")
-    public String resenas() {
-        log.info("HomeController.resenas() - Renderizando reseñas");
-        return "cliente/resenas";
-    }
 
     @GetMapping("/nosotros")
     public String nosotros() {

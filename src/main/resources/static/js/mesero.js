@@ -70,8 +70,14 @@ function renderizarSelectProductos() {
     if (!select) return;
     select.innerHTML = '<option value="">Seleccionar producto...</option>';
     productosDisponibles.forEach(prod => {
-        select.innerHTML += `<option value="${prod.idProducto}" data-precio="${prod.precioVenta}" data-nombre="${prod.nombre}">
-            ${prod.nombre} - S/ ${prod.precioVenta.toFixed(2)}
+        const stockInfo = prod.stockActual > 0 ? `Stock: ${prod.stockActual}` : 'SIN STOCK';
+        const disabled = prod.stockActual <= 0 ? 'disabled' : '';
+        select.innerHTML += `<option value="${prod.idProducto}" 
+            data-precio="${prod.precioVenta}" 
+            data-nombre="${prod.nombre}"
+            data-stock="${prod.stockActual}"
+            ${disabled}>
+            ${prod.nombre} - S/ ${prod.precioVenta.toFixed(2)} (${stockInfo})
         </option>`;
     });
 }
@@ -90,12 +96,12 @@ function renderizarPedidos(pedidos) {
         const fecha = pedido.fechaPedido ? new Date(pedido.fechaPedido).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) : '-';
         const acciones = generarAcciones(pedido);
         return `<tr>
-            <td><span class="fw-bold">${pedido.codigo}</span></td>
-            <td><i class="bi bi-diagram-3 me-1"></i>Mesa ${pedido.numeroMesa}</td>
-            <td>${pedido.clienteNombre || 'Consumidor Final'}</td>
+            <td><span class="fw-bold small">${pedido.codigo}</span></td>
+            <td><i class="bi bi-diagram-3 me-1"></i><span class="d-none d-sm-inline">Mesa </span>${pedido.numeroMesa}</td>
+            <td class="d-none d-md-table-cell small">${pedido.clienteNombre || 'Consumidor Final'}</td>
             <td>${estadoBadge}</td>
-            <td class="fw-bold">S/ ${pedido.total ? pedido.total.toFixed(2) : '0.00'}</td>
-            <td>${fecha}</td>
+            <td class="fw-bold small">S/ ${pedido.total ? pedido.total.toFixed(2) : '0.00'}</td>
+            <td class="d-none d-lg-table-cell small">${fecha}</td>
             <td>${acciones}</td>
         </tr>`;
     }).join('');
@@ -122,17 +128,27 @@ function generarAcciones(pedido) {
         btns += `<button class="btn btn-sm btn-outline-info me-1" onclick="MeseroPedidos.cambiarEstado(${pedido.idPedido}, 'EN_PREPARACION')" title="Enviar a cocina">
             <i class="bi bi-fire"></i>
         </button>`;
-        btns += `<button class="btn btn-sm btn-outline-danger me-1" onclick="MeseroPedidos.cancelarPedido(${pedido.idPedido})" title="Cancelar">
+        btns += `<button class="btn btn-sm btn-outline-danger" onclick="MeseroPedidos.cancelarPedido(${pedido.idPedido})" title="Cancelar pedido">
             <i class="bi bi-x-circle"></i>
         </button>`;
     } else if (estado === 'En Preparación') {
         btns += `<button class="btn btn-sm btn-outline-success me-1" onclick="MeseroPedidos.cambiarEstado(${pedido.idPedido}, 'SERVIDO')" title="Marcar como servido">
             <i class="bi bi-check-circle"></i>
         </button>`;
+        btns += `<button class="btn btn-sm btn-outline-danger" onclick="MeseroPedidos.cancelarPedido(${pedido.idPedido})" title="Cancelar pedido">
+            <i class="bi bi-x-circle"></i>
+        </button>`;
     } else if (estado === 'Servido') {
-        btns += `<button class="btn btn-sm btn-outline-secondary me-1" onclick="MeseroPedidos.cambiarEstado(${pedido.idPedido}, 'PAGADO')" title="Marcar como pagado">
+        btns += `<button class="btn btn-sm btn-outline-secondary me-1" onclick="MeseroPedidos.cambiarEstado(${pedido.idPedido}, 'PAGADO')" title="Registrar pago">
             <i class="bi bi-cash-coin"></i>
         </button>`;
+        btns += `<button class="btn btn-sm btn-outline-danger" onclick="MeseroPedidos.cancelarPedido(${pedido.idPedido})" title="Cancelar pedido">
+            <i class="bi bi-x-circle"></i>
+        </button>`;
+    } else if (estado === 'Pagado') {
+        btns += `<span class="badge bg-success small"><i class="bi bi-check-circle-fill"></i> <span class="d-none d-lg-inline">Completado</span></span>`;
+    } else if (estado === 'Cancelado') {
+        btns += `<span class="badge bg-danger small"><i class="bi bi-x-circle-fill"></i> <span class="d-none d-lg-inline">Cancelado</span></span>`;
     }
 
     return btns;
@@ -218,11 +234,22 @@ function agregarProducto() {
     const option = select.options[select.selectedIndex];
     const nombre = option.getAttribute('data-nombre');
     const precio = parseFloat(option.getAttribute('data-precio'));
+    const stockDisponible = parseInt(option.getAttribute('data-stock'));
 
-    // Verificar si ya existe
+    // Calcular cantidad ya agregada de este producto en el pedido actual
     const existente = detallesPedido.find(d => d.idProducto === productoId);
+    const cantidadYaAgregada = existente ? existente.cantidad : 0;
+    const cantidadTotal = cantidadYaAgregada + cantidad;
+
+    // Validar stock disponible
+    if (cantidadTotal > stockDisponible) {
+        showNotification(`Stock insuficiente para '${nombre}'. Disponible: ${stockDisponible}, Ya agregado: ${cantidadYaAgregada}, Solicitado: ${cantidad}`, 'error');
+        return;
+    }
+
+    // Verificar si ya existe y actualizar
     if (existente) {
-        existente.cantidad += cantidad;
+        existente.cantidad = cantidadTotal;
         existente.subtotal = existente.precioUnitario * existente.cantidad;
     } else {
         detallesPedido.push({
@@ -230,7 +257,8 @@ function agregarProducto() {
             nombre: nombre,
             precioUnitario: precio,
             cantidad: cantidad,
-            subtotal: precio * cantidad
+            subtotal: precio * cantidad,
+            stockDisponible: stockDisponible
         });
     }
 
@@ -285,14 +313,22 @@ async function guardarPedido() {
     const total = detallesPedido.reduce((sum, d) => sum + d.subtotal, 0);
     const codigo = generarCodigo();
 
+    // Formatear fecha como LocalDateTime (sin zona horaria)
+    const now = new Date();
+    const fechaLocal = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + 'T' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+
     const pedidoData = {
         idUsuario: meseroId,
-        idCliente: null,
         idMesa: parseInt(mesaId),
         codigo: codigo,
         estadoPedido: 'PENDIENTE',
         total: total,
-        fechaPedido: new Date().toISOString(),
+        fechaPedido: fechaLocal,
         estadoBD: 'ACTIVO'
     };
 
@@ -313,7 +349,7 @@ async function guardarPedido() {
 
         // Crear los detalles del pedido
         for (const detalle of detallesPedido) {
-            await fetch('/detalle-pedido', {
+            const detalleRes = await fetch('/detalle-pedido', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -324,6 +360,11 @@ async function guardarPedido() {
                     subtotal: detalle.subtotal
                 })
             });
+            if (!detalleRes.ok) {
+                const errDetalle = await detalleRes.json().catch(() => ({}));
+                console.error('Error al guardar detalle:', errDetalle);
+                throw new Error(errDetalle.message || 'Error al guardar los productos del pedido');
+            }
         }
 
         showNotification('Pedido creado exitosamente', 'success');
@@ -335,15 +376,62 @@ async function guardarPedido() {
     }
 }
 
-async function cambiarEstado(idPedido, nuevoEstado) {
-    const estadoTexto = {
-        'EN_PREPARACION': 'En Preparación',
-        'SERVIDO': 'Servido',
-        'PAGADO': 'Pagado',
-        'CANCELADO': 'Cancelado'
-    };
+// Configuración de estilos para cada estado
+const estadoConfig = {
+    'EN_PREPARACION': {
+        texto: 'En Preparación',
+        icon: 'bi-fire',
+        btnClass: 'btn-info',
+        bgClass: 'bg-info',
+        mensaje: '¡Pedido enviado a cocina!',
+        descripcion: 'El equipo de cocina comenzará a preparar los productos.'
+    },
+    'SERVIDO': {
+        texto: 'Servido',
+        icon: 'bi-check-circle',
+        btnClass: 'btn-success',
+        bgClass: 'bg-success',
+        mensaje: '¡Pedido servido!',
+        descripcion: 'Los productos han sido entregados al cliente.'
+    },
+    'PAGADO': {
+        texto: 'Pagado',
+        icon: 'bi-cash-coin',
+        btnClass: 'btn-secondary',
+        bgClass: 'bg-secondary',
+        mensaje: '¡Pago registrado!',
+        descripcion: 'El pedido ha sido completado exitosamente.'
+    },
+    'CANCELADO': {
+        texto: 'Cancelado',
+        icon: 'bi-x-circle',
+        btnClass: 'btn-danger',
+        bgClass: 'bg-danger',
+        mensaje: 'Pedido cancelado',
+        descripcion: 'El pedido ha sido cancelado y el stock fue devuelto.'
+    }
+};
 
-    if (!confirm(`¿Cambiar el estado del pedido a "${estadoTexto[nuevoEstado]}"?`)) return;
+async function cambiarEstado(idPedido, nuevoEstado) {
+    const config = estadoConfig[nuevoEstado];
+    if (!config) return;
+
+    // Buscar el pedido para obtener su código
+    const pedido = pedidosData.find(p => p.idPedido === idPedido);
+    const codigoPedido = pedido ? pedido.codigo : `#${idPedido}`;
+
+    // Mostrar modal de confirmación con Bootstrap
+    const confirmed = await mostrarModalConfirmacion(codigoPedido, config, nuevoEstado);
+    if (!confirmed) return;
+
+    // Mostrar estado de carga en el botón
+    const btnOriginal = event?.target;
+    let btnHtmlOriginal = '';
+    if (btnOriginal) {
+        btnHtmlOriginal = btnOriginal.innerHTML;
+        btnOriginal.disabled = true;
+        btnOriginal.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+    }
 
     try {
         const response = await fetch(`/pedido/${idPedido}`, {
@@ -357,12 +445,126 @@ async function cambiarEstado(idPedido, nuevoEstado) {
             throw new Error(err.message || 'Error al cambiar estado');
         }
 
-        showNotification(`Estado cambiado a ${estadoTexto[nuevoEstado]}`, 'success');
+        // Notificación de éxito con estilo según el estado
+        showNotificationEstado(codigoPedido, config);
         cargarPedidos();
+        // Recargar productos para actualizar stock (en caso de cancelación)
+        if (nuevoEstado === 'CANCELADO') {
+            cargarProductos();
+        }
     } catch (error) {
         console.error('Error cambiando estado:', error);
         showNotification(error.message || 'Error al cambiar estado', 'error');
+    } finally {
+        // Restaurar botón
+        if (btnOriginal) {
+            btnOriginal.disabled = false;
+            btnOriginal.innerHTML = btnHtmlOriginal;
+        }
     }
+}
+
+function mostrarModalConfirmacion(codigoPedido, config, nuevoEstado) {
+    return new Promise((resolve) => {
+        // Crear modal dinámicamente
+        const modalId = 'confirmEstadoModal';
+        let modal = document.getElementById(modalId);
+        
+        // Remover modal anterior si existe
+        if (modal) modal.remove();
+
+        const esCancelacion = nuevoEstado === 'CANCELADO';
+        const headerClass = esCancelacion ? 'bg-danger text-white' : config.bgClass + ' text-white';
+        const btnConfirmClass = esCancelacion ? 'btn-danger' : config.btnClass;
+
+        const modalHtml = `
+            <div class="modal fade" id="${modalId}" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header ${headerClass}">
+                            <h5 class="modal-title">
+                                <i class="bi ${config.icon} me-2"></i>
+                                Confirmar cambio de estado
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <div class="mb-3">
+                                <span class="badge ${config.bgClass} fs-6 px-3 py-2">
+                                    <i class="bi ${config.icon} me-1"></i> ${config.texto}
+                                </span>
+                            </div>
+                            <p class="mb-1">¿Cambiar el estado del pedido <strong>${codigoPedido}</strong>?</p>
+                            <p class="text-muted small mb-0">${config.descripcion}</p>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="btnCancelarConfirm">
+                                <i class="bi bi-arrow-left me-1"></i> Volver
+                            </button>
+                            <button type="button" class="btn ${btnConfirmClass}" id="btnConfirmarEstado">
+                                <i class="bi ${config.icon} me-1"></i> Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById(modalId);
+        const bsModal = new bootstrap.Modal(modal);
+
+        // Manejar confirmación
+        document.getElementById('btnConfirmarEstado').onclick = () => {
+            bsModal.hide();
+            resolve(true);
+        };
+
+        // Manejar cancelación
+        document.getElementById('btnCancelarConfirm').onclick = () => {
+            resolve(false);
+        };
+        modal.addEventListener('hidden.bs.modal', () => {
+            modal.remove();
+        });
+
+        bsModal.show();
+    });
+}
+
+function showNotificationEstado(codigoPedido, config) {
+    const alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) return;
+
+    const alertId = 'alert-' + Date.now();
+    const alertType = config.bgClass.replace('bg-', '');
+    
+    const alertHTML = `
+        <div id="${alertId}" class="alert alert-${alertType} alert-dismissible fade show shadow" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi ${config.icon} fs-4 me-3"></i>
+                <div>
+                    <strong>${config.mensaje}</strong>
+                    <div class="small">Pedido ${codigoPedido} → ${config.texto}</div>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+
+    alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+
+    // Auto-remover después de 4 segundos
+    setTimeout(() => {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+            alert.classList.add('fade-out');
+            setTimeout(() => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert?.close();
+            }, 300);
+        }
+    }, 4000);
 }
 
 function cancelarPedido(idPedido) {
@@ -371,15 +573,19 @@ function cancelarPedido(idPedido) {
 
 async function verDetalle(idPedido) {
     try {
-        const response = await fetch(`/pedido/${idPedido}`);
-        const pedido = await response.json();
+        const [pedidoRes, detallesRes] = await Promise.all([
+            fetch(`/pedido/${idPedido}`),
+            fetch(`/detalle-pedido/pedido/${idPedido}`)
+        ]);
 
-        const detallesResp = await fetch('/detalle-pedido');
-        const todosDetalles = await detallesResp.json();
-        const detalles = Array.isArray(todosDetalles) ? todosDetalles.filter(d => d.idPedido === idPedido) : [];
+        if (!pedidoRes.ok) throw new Error('No se pudo obtener el pedido');
+        if (!detallesRes.ok) throw new Error('No se pudo obtener los productos del pedido');
+
+        const pedido   = await pedidoRes.json();
+        const detalles = await detallesRes.json();
 
         let detallesHtml = '';
-        if (detalles.length > 0) {
+        if (Array.isArray(detalles) && detalles.length > 0) {
             detallesHtml = `<table class="table table-sm">
                 <thead><tr><th>Producto</th><th>Cant.</th><th>P.Unit.</th><th>Subtotal</th></tr></thead>
                 <tbody>${detalles.map(d => `<tr>
@@ -416,12 +622,36 @@ async function verDetalle(idPedido) {
 }
 
 function showNotification(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed`;
-    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    toast.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'x-circle'}"></i> ${message}`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    const alertContainer = document.getElementById('alertContainer');
+    if (!alertContainer) {
+        console.error('Alert container not found');
+        return;
+    }
+
+    // Mapear tipos
+    const alertType = type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info';
+    const icon = type === 'success' ? 'check-circle-fill' : type === 'error' ? 'exclamation-triangle-fill' : 'info-circle-fill';
+
+    // Crear el alert
+    const alertId = 'alert-' + Date.now();
+    const alertHTML = `
+        <div id="${alertId}" class="alert alert-${alertType} alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-${icon} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+
+    alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 5000);
 }
 
 // Exportar funciones

@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/detalle-pedido")
 @RequiredArgsConstructor
@@ -28,6 +30,12 @@ public class DetallePedidoController {
         log.info("Recibida solicitud para obtener todos los detalles de pedido");
         Iterable<DetallePedidoResponseDTO> detalles = detallePedidoService.allList();
         return ResponseEntity.ok(detalles);
+    }
+
+    @GetMapping("/pedido/{idPedido}")
+    public ResponseEntity<List<DetallePedidoResponseDTO>> getByPedido(@PathVariable Integer idPedido) {
+        log.info("Recibida solicitud para obtener detalles del pedido ID: {}", idPedido);
+        return ResponseEntity.ok(detallePedidoService.findByPedido(idPedido));
     }
 
     @GetMapping("/{id}")

@@ -16,15 +16,19 @@
             <!-- Page Header -->
             <div class="page-header" style="background: linear-gradient(135deg, rgba(26,26,26,0.9) 0%, rgba(45,45,45,0.8) 100%), url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920') center/cover no-repeat;">
                 <div class="container">
-                    <h1>Mis Resenas</h1>
+                    <h1>Mis Reseñas</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
-                            <li class="breadcrumb-item active">Mis Resenas</li>
+                            <li class="breadcrumb-item active">Mis Reseñas</li>
                         </ol>
                     </nav>
                 </div>
             </div>
+
+            <!-- Alert container -->
+            <div id="alertContainer" class="container mt-3"></div>
+
             <section class="content-section">
                 <div class="container">
                     <div class="row">
@@ -32,198 +36,327 @@
                         <div class="col-lg-3 mb-4">
                             <div class="card-gastro p-4">
                                 <div class="text-center mb-4">
-                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));">
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                                         style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));">
                                         <i class="bi bi-person-fill text-white" style="font-size: 2.5rem;"></i>
                                     </div>
-                                    <h5 th:text="${session.clienteNombre != null} ? ${session.clienteNombre} : 'Cliente'">Juan Perez</h5>
-                                    <p class="text-muted small mb-0">Cliente desde 2024</p>
+                                    <h5 th:text="${clienteNombre != null} ? ${clienteNombre} : 'Cliente'">Juan Perez</h5>
+                                    <p class="text-muted small mb-0">Cliente</p>
                                 </div>
                                 <ul class="list-unstyled">
                                     <li class="mb-2">
-                                        <a th:href="@{/mis-pedidos}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none hover-bg">
-                                            <i class="bi bi-bag me-3 text-orange"></i> Mis Pedidos
-                                        </a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a th:href="@{/mis-resenas}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none" style="background: var(--light-orange-bg);">
-                                            <i class="bi bi-star-fill me-3 text-orange"></i> Mis Resenas
-                                        </a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a th:href="@{/mi-perfil}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none hover-bg">
-                                            <i class="bi bi-person me-3 text-orange"></i> Mi Perfil
+                                        <a th:href="@{/mis-resenas}" class="d-flex align-items-center p-2 rounded text-dark text-decoration-none"
+                                           style="background: var(--light-orange-bg);">
+                                            <i class="bi bi-star-fill me-3 text-orange"></i> Mis Reseñas
                                         </a>
                                     </li>
                                 </ul>
                                 <hr>
                                 <div class="text-center">
-                                    <p class="small text-muted mb-1">Total de resenas</p>
-                                    <h3 class="text-orange mb-0" th:text="${resenas != null} ? ${#lists.size(resenas)} : '5'">5</h3>
+                                    <p class="small text-muted mb-1">Total de reseñas</p>
+                                    <h3 class="text-orange mb-0"
+                                        th:text="${resenas != null} ? ${#lists.size(resenas)} : '0'">0</h3>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Main Content -->
                         <div class="col-lg-9">
                             <!-- Tabs -->
                             <ul class="nav nav-pills mb-4">
                                 <li class="nav-item">
-                                    <a class="nav-link active" href="#pendientes" data-bs-toggle="pill" style="background: var(--primary-orange);">
-                                        <i class="bi bi-hourglass-split me-1"></i> Pendientes de Resenar
+                                    <a class="nav-link active" href="#nueva" data-bs-toggle="pill"
+                                       style="background: var(--primary-orange);">
+                                        <i class="bi bi-plus-circle me-1"></i> Nueva Reseña
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="#realizadas" data-bs-toggle="pill">
-                                        <i class="bi bi-check-circle me-1"></i> Resenas Realizadas
+                                        <i class="bi bi-check-circle me-1"></i> Reseñas Realizadas
                                     </a>
                                 </li>
                             </ul>
+
                             <div class="tab-content">
-                                <!-- Pendientes -->
-                                <div class="tab-pane fade show active" id="pendientes">
-                                    <h5 class="mb-4">Productos pendientes de resenar</h5>
-                                    <!-- Pedido pendiente de resena -->
-                                    <div class="resena-card" data-pedido="1" data-producto="1">
-                                        <div class="resena-header">
-                                            <div class="resena-product">
-                                                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=60" alt="Pizza">
-                                                <div>
-                                                    <h6>Pizza Margherita</h6>
-                                                    <span>Pedido #001 - 20 Ene 2024</span>
+                                <!-- ── TAB: Nueva Reseña con código ── -->
+                                <div class="tab-pane fade show active" id="nueva">
+
+                                    <!-- Paso 1: Ingresar código -->
+                                    <div id="paso1">
+                                        <h5 class="mb-1">Ingresa el código de tu pedido</h5>
+                                        <p class="text-muted small mb-4">
+                                            El mesero te habrá entregado un código de 6 caracteres al finalizar tu pedido.
+                                        </p>
+                                        <div class="card-gastro p-4">
+                                            <div class="row g-3 align-items-end">
+                                                <div class="col-sm-7">
+                                                    <label class="form-label fw-semibold">Código del pedido</label>
+                                                    <input type="text" id="codigoPedido"
+                                                           class="form-control form-control-lg text-uppercase fw-bold text-center"
+                                                           placeholder="Ej: ABC123"
+                                                           maxlength="6"
+                                                           style="letter-spacing: 6px; font-size: 1.4rem;">
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <button class="btn btn-gastro w-100 py-2"
+                                                            onclick="buscarPedido()"
+                                                            id="btnBuscar">
+                                                        <i class="bi bi-search me-2"></i> Buscar Pedido
+                                                    </button>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="resena-rating mb-3">
-                                            <input type="hidden" name="calificacion" value="0">
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <span class="ms-2 text-muted small">Selecciona una calificacion</span>
-                                        </div>
-                                        <div class="resena-form">
-                                            <textarea class="mb-3" rows="3" placeholder="Cuentanos tu experiencia con este producto... (opcional)"></textarea>
-                                            <button class="btn btn-gastro" onclick="submitResena(1, 1)">
-                                                <i class="bi bi-send me-1"></i> Enviar Resena
-                                            </button>
                                         </div>
                                     </div>
-                                    <div class="resena-card" data-pedido="1" data-producto="2">
-                                        <div class="resena-header">
-                                            <div class="resena-product">
-                                                <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=60" alt="Limonada">
-                                                <div>
-                                                    <h6>Limonada Especial</h6>
-                                                    <span>Pedido #001 - 20 Ene 2024</span>
-                                                </div>
+
+                                    <!-- Paso 2: Productos del pedido para reseñar -->
+                                    <div id="paso2" class="d-none">
+                                        <div class="d-flex align-items-center gap-3 mb-4">
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="volverPaso1()">
+                                                <i class="bi bi-arrow-left"></i> Cambiar código
+                                            </button>
+                                            <div>
+                                                <h5 class="mb-0">Pedido <span id="codigoMostrado" class="text-orange fw-bold"></span></h5>
+                                                <p class="text-muted small mb-0">Selecciona un producto y escribe tu reseña</p>
                                             </div>
                                         </div>
-                                        <div class="resena-rating mb-3">
-                                            <input type="hidden" name="calificacion" value="0">
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <i class="bi bi-star empty"></i>
-                                            <span class="ms-2 text-muted small">Selecciona una calificacion</span>
-                                        </div>
-                                        <div class="resena-form">
-                                            <textarea class="mb-3" rows="3" placeholder="Cuentanos tu experiencia con este producto... (opcional)"></textarea>
-                                            <button class="btn btn-gastro" onclick="submitResena(1, 2)">
-                                                <i class="bi bi-send me-1"></i> Enviar Resena
-                                            </button>
-                                        </div>
+
+                                        <!-- Lista de productos del pedido -->
+                                        <div id="productosLista"></div>
                                     </div>
                                 </div>
-                                <!-- Realizadas -->
+
+                                <!-- ── TAB: Reseñas Realizadas ── -->
                                 <div class="tab-pane fade" id="realizadas">
-                                    <h5 class="mb-4">Mis resenas anteriores</h5>
-                                    <div class="resena-card" th:each="resena : ${resenas}" th:if="${resenas != null}">
-                                        <div class="resena-header">
-                                            <div class="resena-product">
-                                                <img th:src="@{'/uploads/products/' + ${resena.idProducto.imagenUrl}}" alt="Producto" onerror="this.src='https://via.placeholder.com/60'">
-                                                <div>
-                                                    <h6 th:text="${resena.idProducto.nombre}">Producto</h6>
-                                                    <span th:text="'Pedido #' + ${resena.idPedido.idPedido} + ' - ' + ${#temporals.format(resena.fechaResena, 'dd MMM yyyy')}">Pedido</span>
-                                                </div>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i th:each="i : ${#numbers.sequence(1, resena.calificacion)}" class="bi bi-star-fill"></i>
-                                                <i th:each="i : ${#numbers.sequence(resena.calificacion + 1, 5)}" class="bi bi-star empty"></i>
-                                            </div>
-                                        </div>
-                                        <p class="mb-0 text-muted" th:text="${resena.comentario}">Comentario de la resena</p>
+                                    <h5 class="mb-4">Mis reseñas anteriores</h5>
+
+                                    <!-- Sin reseñas -->
+                                    <div th:if="${resenas == null or #lists.isEmpty(resenas)}" class="card-gastro p-5 text-center">
+                                        <i class="bi bi-star text-muted" style="font-size: 3rem;"></i>
+                                        <p class="text-muted mt-3 mb-0">Aún no has realizado ninguna reseña.</p>
+                                        <p class="text-muted small">Usa el código de tu pedido para dejar tu primera reseña.</p>
                                     </div>
-                                    <!-- Ejemplo de resenas realizadas -->
-                                    <div class="resena-card" th:if="${resenas == null}">
+
+                                    <!-- Reseñas del cliente -->
+                                    <div th:each="resena : ${resenas}" class="resena-card mb-3">
                                         <div class="resena-header">
                                             <div class="resena-product">
-                                                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=60" alt="Hamburguesa">
                                                 <div>
-                                                    <h6>Hamburguesa Premium</h6>
-                                                    <span>Pedido #002 - 15 Ene 2024</span>
+                                                    <h6 class="mb-0" th:text="${resena.productoNombre}">Producto</h6>
+                                                    <span class="text-muted small"
+                                                          th:text="'Pedido #' + ${resena.codigoPedido} + ' · ' + ${#temporals.format(resena.fechaResena, 'dd MMM yyyy')}">
+                                                        Pedido
+                                                    </span>
                                                 </div>
                                             </div>
                                             <div class="rating-stars">
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
+                                                <i th:each="i : ${#numbers.sequence(1, resena.calificacion)}"
+                                                   class="bi bi-star-fill text-warning"></i>
+                                                <i th:each="i : ${#numbers.sequence(resena.calificacion + 1, 5)}"
+                                                   class="bi bi-star text-muted"></i>
                                             </div>
                                         </div>
-                                        <p class="mb-0 text-muted">Excelente hamburguesa, la carne muy jugosa y el pan estaba perfecto. Sin duda la mejor que he probado!</p>
-                                    </div>
-                                    <div class="resena-card" th:if="${resenas == null}">
-                                        <div class="resena-header">
-                                            <div class="resena-product">
-                                                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=60" alt="Tiramisu">
-                                                <div>
-                                                    <h6>Tiramisu</h6>
-                                                    <span>Pedido #002 - 15 Ene 2024</span>
-                                                </div>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star empty"></i>
-                                            </div>
-                                        </div>
-                                        <p class="mb-0 text-muted">Muy rico el tiramisu, buen balance entre el cafe y el mascarpone. Porcion generosa.</p>
-                                    </div>
-                                    <div class="resena-card" th:if="${resenas == null}">
-                                        <div class="resena-header">
-                                            <div class="resena-product">
-                                                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=60" alt="Ensalada">
-                                                <div>
-                                                    <h6>Ensalada Cesar</h6>
-                                                    <span>Pedido #003 - 10 Ene 2024</span>
-                                                </div>
-                                            </div>
-                                            <div class="rating-stars">
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-fill"></i>
-                                                <i class="bi bi-star-half"></i>
-                                            </div>
-                                        </div>
-                                        <p class="mb-0 text-muted">Ensalada muy fresca, los crutones caseros son un gran plus. La salsa cesar tiene muy buen sabor.</p>
+                                        <p class="mb-0 text-muted small mt-2"
+                                           th:text="${resena.comentario != null and !#strings.isEmpty(resena.comentario)} ? ${resena.comentario} : 'Sin comentario'">
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div><!-- /tab-content -->
+                        </div><!-- /col-lg-9 -->
                     </div>
                 </div>
             </section>
         </th:block>
     </div>
+
     <style>
-        .hover-bg:hover { background: var(--light-orange-bg); }
         .nav-pills .nav-link { color: var(--dark-gray); }
         .nav-pills .nav-link:hover { background: var(--light-orange-bg); color: var(--primary-orange); }
+
+        /* Estrellas interactivas */
+        .star-rating { display: flex; gap: 6px; flex-direction: row-reverse; justify-content: flex-end; }
+        .star-rating input { display: none; }
+        .star-rating label {
+            font-size: 1.8rem; color: #ccc; cursor: pointer;
+            transition: color 0.15s;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label { color: #f5a623; }
+
+        .producto-resena-card { border: 1px solid var(--border-gray); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; background: #fff; }
+        .producto-resena-card.ya-resenado { background: #f8f9fa; opacity: .75; }
+        .producto-resena-card textarea { width: 100%; border: 1px solid var(--border-gray); border-radius: 8px; padding: .6rem 1rem; resize: none; }
+        .producto-resena-card textarea:focus { outline: none; border-color: var(--primary-orange); }
+
+        .btn-gastro { background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange)); color: #fff; border: none; border-radius: 25px; padding: .55rem 1.5rem; font-weight: 600; }
+        .btn-gastro:hover { opacity: .9; color: #fff; }
+
+        .text-orange { color: var(--primary-orange) !important; }
+        .resena-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .5rem; }
+        .resena-product { display: flex; align-items: center; gap: 12px; }
     </style>
+
+    <script th:inline="javascript">
+        let pedidoActual = null;  // { idPedido, codigoPedido, productos[] }
+
+        // ── Buscar pedido por código ─────────────────────────────────────────
+        async function buscarPedido() {
+            const codigo = document.getElementById('codigoPedido').value.trim();
+            if (!codigo) { showAlert('Ingresa el código del pedido', 'warning'); return; }
+            if (codigo.length < 4) { showAlert('El código debe tener al menos 4 caracteres', 'warning'); return; }
+
+            const btn = document.getElementById('btnBuscar');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Buscando...';
+
+            try {
+                const res = await fetch(`/mis-resenas/buscar-pedido?codigo=${encodeURIComponent(codigo)}`);
+                const data = await res.json();
+
+                if (!res.ok) { showAlert(data.error || 'Error al buscar el pedido', 'danger'); return; }
+
+                pedidoActual = data;
+                mostrarProductos(data);
+            } catch (e) {
+                showAlert('Error de conexión. Intenta nuevamente.', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-search me-2"></i> Buscar Pedido';
+            }
+        }
+
+        // ── Mostrar productos del pedido ─────────────────────────────────────
+        function mostrarProductos(pedido) {
+            document.getElementById('codigoMostrado').textContent = pedido.codigoPedido;
+            const lista = document.getElementById('productosLista');
+
+            if (!pedido.productos || pedido.productos.length === 0) {
+                lista.innerHTML = '<p class="text-muted">Este pedido no tiene productos.</p>';
+            } else {
+                lista.innerHTML = pedido.productos.map((p, i) => productoCardHTML(p, i)).join('');
+            }
+
+            document.getElementById('paso1').classList.add('d-none');
+            document.getElementById('paso2').classList.remove('d-none');
+        }
+
+        // ── HTML de cada tarjeta de producto ─────────────────────────────────
+        function productoCardHTML(producto, index) {
+            if (producto.yaResenado) {
+                return `
+                <div class="producto-resena-card ya-resenado d-flex align-items-center gap-3">
+                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                    <div>
+                        <p class="fw-semibold mb-0">${producto.nombre}</p>
+                        <small class="text-muted">Ya enviaste una reseña para este producto</small>
+                    </div>
+                </div>`;
+            }
+
+            return `
+            <div class="producto-resena-card" id="card-${index}">
+                <p class="fw-semibold mb-3"><i class="bi bi-box-seam me-2 text-orange"></i>${producto.nombre}</p>
+
+                <label class="form-label small text-muted mb-1">Calificación <span class="text-danger">*</span></label>
+                <div class="star-rating mb-3" id="stars-${index}">
+                    ${[5,4,3,2,1].map(n => `
+                        <input type="radio" name="cal-${index}" id="s${n}-${index}" value="${n}">
+                        <label for="s${n}-${index}" title="${n} estrella${n>1?'s':''}">&#9733;</label>
+                    `).join('')}
+                </div>
+
+                <label class="form-label small text-muted mb-1">Comentario <span class="text-muted">(opcional)</span></label>
+                <textarea id="comentario-${index}" rows="3"
+                          placeholder="Cuéntanos tu experiencia con este producto..."
+                          maxlength="500"></textarea>
+                <div class="text-end mt-1"><small class="text-muted" id="chars-${index}">0/500</small></div>
+
+                <button class="btn btn-gastro mt-3" onclick="enviarResena(${index}, ${producto.idProducto})">
+                    <i class="bi bi-send me-1"></i> Enviar Reseña
+                </button>
+            </div>`;
+        }
+
+        // Contador de caracteres
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'TEXTAREA' && e.target.id.startsWith('comentario-')) {
+                const idx = e.target.id.split('-')[1];
+                const counter = document.getElementById('chars-' + idx);
+                if (counter) counter.textContent = e.target.value.length + '/500';
+            }
+        });
+
+        // ── Enviar reseña ────────────────────────────────────────────────────
+        async function enviarResena(index, idProducto) {
+            const calInput = document.querySelector(`input[name="cal-${index}"]:checked`);
+            if (!calInput) { showAlert('Selecciona una calificación', 'warning'); return; }
+
+            const calificacion = parseInt(calInput.value);
+            const comentario   = document.getElementById(`comentario-${index}`).value.trim();
+
+            try {
+                const res = await fetch('/mis-resenas/enviar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idPedido:    pedidoActual.idPedido,
+                        idProducto:  idProducto,
+                        calificacion: calificacion,
+                        comentario:  comentario || null
+                    })
+                });
+                const data = await res.json();
+
+                if (!res.ok) { showAlert(data.error || 'Error al enviar la reseña', 'danger'); return; }
+
+                // Reemplazar la card por mensaje de éxito
+                const card = document.getElementById(`card-${index}`);
+                card.className = 'producto-resena-card ya-resenado';
+                card.innerHTML = `
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                        <div>
+                            <p class="fw-semibold mb-0">${document.querySelector(`#card-${index} .fw-semibold`)?.textContent || 'Producto'}</p>
+                            <small class="text-muted">¡Reseña enviada exitosamente!</small>
+                        </div>
+                    </div>`;
+
+                showAlert('¡Reseña enviada exitosamente!', 'success');
+            } catch (e) {
+                showAlert('Error de conexión. Intenta nuevamente.', 'danger');
+            }
+        }
+
+        // ── Volver al paso 1 ─────────────────────────────────────────────────
+        function volverPaso1() {
+            pedidoActual = null;
+            document.getElementById('codigoPedido').value = '';
+            document.getElementById('paso1').classList.remove('d-none');
+            document.getElementById('paso2').classList.add('d-none');
+        }
+
+        // ── Buscar con Enter ─────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('codigoPedido').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') buscarPedido();
+            });
+        });
+
+        // ── Alertas Bootstrap ─────────────────────────────────────────────────
+        function showAlert(msg, type = 'info') {
+            const icons = { success: 'check-circle-fill', danger: 'exclamation-triangle-fill', warning: 'exclamation-circle-fill', info: 'info-circle-fill' };
+            const id = 'alert-' + Date.now();
+            const html = `
+                <div id="${id}" class="alert alert-${type} alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-${icons[type] || icons.info} me-2"></i>${msg}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+            document.getElementById('alertContainer').insertAdjacentHTML('beforeend', html);
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) { new bootstrap.Alert(el).close(); }
+            }, 5000);
+        }
+    </script>
 </body>
 </html>

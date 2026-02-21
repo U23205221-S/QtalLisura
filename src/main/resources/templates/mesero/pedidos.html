@@ -134,18 +134,18 @@
                                     </div>
                                 </div>
                                 <h6 class="mb-3"><i class="bi bi-basket-fill me-2"></i>Productos del Pedido</h6>
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-5">
-                                        <select class="form-select" id="selectProducto">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12 col-md-5">
+                                        <select class="form-select form-select-sm form-select-md-default" id="selectProducto">
                                             <option value="">Seleccionar producto...</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <input type="number" class="form-control" id="cantidadProducto" placeholder="Cantidad" min="1" value="1">
+                                    <div class="col-6 col-md-3">
+                                        <input type="number" class="form-control form-control-sm form-control-md-default" id="cantidadProducto" placeholder="Cant." min="1" value="1">
                                     </div>
-                                    <div class="col-md-4">
-                                        <button type="button" class="btn btn-success w-100" onclick="MeseroPedidos.agregarProducto()">
-                                            <i class="bi bi-plus-circle me-1"></i> Agregar
+                                    <div class="col-6 col-md-4">
+                                        <button type="button" class="btn btn-success btn-sm w-100" onclick="MeseroPedidos.agregarProducto()">
+                                            <i class="bi bi-plus-circle me-1"></i> <span class="d-none d-sm-inline">Agregar</span><span class="d-inline d-sm-none">+</span>
                                         </button>
                                     </div>
                                 </div>

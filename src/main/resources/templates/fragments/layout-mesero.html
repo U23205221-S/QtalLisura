@@ -63,16 +63,12 @@
                     <button class="toggle-sidebar">
                         <i class="bi bi-list"></i>
                     </button>
-                    <div class="search-box">
+                    <div class="search-box d-none d-lg-flex">
                         <i class="bi bi-search"></i>
                         <input type="text" placeholder="Buscar...">
                     </div>
                 </div>
                 <div class="header-right">
-                    <button class="header-icon notifications">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
                     <button class="header-icon" onclick="handleLogout()" title="Cerrar sesión">
                         <i class="bi bi-box-arrow-right"></i>
                     </button>
@@ -81,6 +77,8 @@
 
             <!-- Page Content -->
             <div class="admin-content">
+                <!-- Alert Container para notificaciones -->
+                <div id="alertContainer"></div>
                 <th:block th:replace="${content}"></th:block>
             </div>
         </main>
